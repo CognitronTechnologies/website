@@ -1,30 +1,46 @@
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import ServiceCard from '../components/ServiceCard'
+import { CpuChipIcon, CloudIcon, CubeTransparentIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline'
+
+const services = [
+  {
+    title: "AI Solutions",
+    Icon: CpuChipIcon,
+    color: "text-blue-400",
+    desc: "Leverage machine learning and intelligent automation to optimize your workflow and unlock new business insights.",
+  },
+  {
+    title: "Blockchain Integration",
+    Icon: CubeTransparentIcon,
+    color: "text-purple-400",
+    desc: "Secure, transparent, and scalable blockchain applications for decentralized finance, supply chain, and more.",
+  },
+  {
+    title: "Cloud Transformation",
+    Icon: CloudIcon,
+    color: "text-yellow-400",
+    desc: "Move, scale, and optimize your infrastructure with our full-stack cloud migration and management services.",
+  },
+  {
+    title: "Tech Consulting",
+    Icon: AdjustmentsHorizontalIcon,
+    color: "text-pink-400",
+    desc: "Expert guidance to align your technology roadmap with business goals, including security and compliance.",
+  },
+]
 
 export default function Services() {
   return (
     <div className="bg-page min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1 max-w-3xl mx-auto py-12 px-4">
-        <h1 className="text-4xl font-bold mb-6 text-blue-400">Our Services</h1>
-        <ul className="space-y-6 text-white/90">
-          <li>
-            <h2 className="text-2xl font-semibold">Custom Software Development</h2>
-            <p>We design and build web and mobile applications tailored to your business needs.</p>
-          </li>
-          <li>
-            <h2 className="text-2xl font-semibold">Cloud Solutions</h2>
-            <p>Migration, deployment, and management of cloud infrastructure for scalable operations.</p>
-          </li>
-          <li>
-            <h2 className="text-2xl font-semibold">AI & Automation</h2>
-            <p>Integrate intelligent systems to automate tasks and enhance productivity.</p>
-          </li>
-          <li>
-            <h2 className="text-2xl font-semibold">Consulting & Strategy</h2>
-            <p>Expert advice to help you leverage technology for growth and efficiency.</p>
-          </li>
-        </ul>
+      <main className="flex-1 max-w-5xl mx-auto py-12 px-4">
+        <h1 className="text-4xl font-bold mb-10 text-blue-400 text-center">Our Services</h1>
+        <div className="grid md:grid-cols-2 gap-8">
+          {services.map((service) => (
+            <ServiceCard key={service.title} {...service} />
+          ))}
+        </div>
       </main>
       <Footer />
     </div>
