@@ -1,7 +1,7 @@
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import ServiceCard from '../components/ServiceCard'
-import { CpuChipIcon, CloudIcon, CubeTransparentIcon, AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline"
+import { CpuChipIcon, CloudIcon, CubeTransparentIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline'
 
 const services = [
   {
@@ -37,8 +37,8 @@ export default function Services() {
       <main className="flex-1 max-w-5xl mx-auto py-12 px-4">
         <h1 className="text-4xl font-bold mb-10 text-blue-400 text-center">Our Services</h1>
         <div className="grid md:grid-cols-2 gap-8">
-          {services.map((service, i) => (
-            <ServiceCard key={i} {...service} />
+          {services.map((service) => (
+            <ServiceCard key={service.title} {...service} />
           ))}
         </div>
       </main>

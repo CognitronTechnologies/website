@@ -10,7 +10,7 @@ export default function ServiceCard({ title, Icon, desc, color }) {
       viewport={{ once: true }}
       transition={{ duration: 0.45 }}
     >
-      <Icon className={`w-12 h-12 mb-3 ${color}`} />
+      <Icon className={`w-12 h-12 mb-3 ${color}`} aria-hidden="true" />
       <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
       <p className="text-white/80 text-center">{desc}</p>
     </motion.div>
