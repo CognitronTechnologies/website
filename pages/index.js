@@ -1,155 +1,115 @@
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import TechHero from '../components/TechHero'
-import AnimatedSection from '../components/AnimatedSection'
-import AnimatedCTA from '../components/AnimatedCTA'
-import Link from 'next/link'
+import { ArrowRightIcon, CpuChipIcon, RocketLaunchIcon, ShieldCheckIcon, UsersIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
 
 export default function Home() {
   return (
     <div className="bg-page min-h-screen flex flex-col">
       <Navbar />
-      <TechHero />
-      <main className="flex-1 max-w-5xl mx-auto py-8 px-4 flex flex-col gap-12">
-        {/* Services Overview */}
-        <section className="mb-10">
-          <h2 className="text-3xl font-bold text-blue-400 mb-6 text-center">Explore Our Expertise</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <motion.div
-              className="bg-navy-dark rounded-lg shadow-md p-6 flex flex-col justify-between transition-transform duration-300 hover:scale-105 hover:shadow-blue-500/30"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="max-w-4xl mx-auto px-4 pt-16 pb-24 text-center">
+          <motion.h1
+            className="text-5xl md:text-6xl font-extrabold text-blue-400 mb-6 drop-shadow-lg"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+          >
+            Elevate Your Business with <span className="text-purple-400">Cognitron</span>
+          </motion.h1>
+          <motion.p
+            className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+          >
+            We create transformative digital solutions powered by empathy, innovation, and cutting-edge technology. Let’s shape tomorrow’s experiences—together.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            <a
+              href="/contact"
+              className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-4 px-10 rounded-full shadow-lg hover:from-blue-400 hover:to-purple-400 transition text-lg"
             >
-              <h3 className="text-2xl text-white font-semibold mb-2">AI Solutions</h3>
-              <p className="text-white/80 mb-4">
-                Unlock the power of artificial intelligence to automate, analyze and scale your business.
-              </p>
-              <Link href="/services" className="bg-blue-500 text-white px-4 py-2 rounded font-bold hover:bg-blue-400 w-max">Learn More</Link>
+              Start Your Project <ArrowRightIcon className="w-6 h-6 inline ml-2" />
+            </a>
+          </motion.div>
+        </section>
+
+        {/* Highlighted Services */}
+        <section className="max-w-5xl mx-auto px-4 pb-20">
+          <motion.h2
+            className="text-3xl font-bold text-blue-300 mb-8 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
+            What We Do Best
+          </motion.h2>
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            <motion.div
+              className="bg-navy-dark rounded-xl p-6 shadow-lg flex flex-col items-center text-center border border-blue-900"
+              whileHover={{ scale: 1.04 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <CpuChipIcon className="w-12 h-12 text-blue-400 mb-3" />
+              <h3 className="text-xl font-semibold text-white mb-2">AI & Automation</h3>
+              <p className="text-white/80 mb-2">Build smarter processes and products with custom machine learning and automation solutions.</p>
             </motion.div>
             <motion.div
-              className="bg-navy-dark rounded-lg shadow-md p-6 flex flex-col justify-between transition-transform duration-300 hover:scale-105 hover:shadow-blue-500/30"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              className="bg-navy-dark rounded-xl p-6 shadow-lg flex flex-col items-center text-center border border-blue-900"
+              whileHover={{ scale: 1.04 }}
+              transition={{ type: "spring", stiffness: 300 }}
             >
-              <h3 className="text-2xl text-white font-semibold mb-2">Blockchain Development</h3>
-              <p className="text-white/80 mb-4">
-                Build secure, transparent, and scalable blockchain apps for next-gen businesses.
-              </p>
-              <Link href="/services" className="bg-blue-500 text-white px-4 py-2 rounded font-bold hover:bg-blue-400 w-max">See Blockchain</Link>
+              <RocketLaunchIcon className="w-12 h-12 text-purple-400 mb-3" />
+              <h3 className="text-xl font-semibold text-white mb-2">Cloud Transformation</h3>
+              <p className="text-white/80 mb-2">Modernize and scale with secure, resilient cloud platforms tailored to your business.</p>
             </motion.div>
             <motion.div
-              className="bg-navy-dark rounded-lg shadow-md p-6 flex flex-col justify-between transition-transform duration-300 hover:scale-105 hover:shadow-blue-500/30"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
+              className="bg-navy-dark rounded-xl p-6 shadow-lg flex flex-col items-center text-center border border-blue-900"
+              whileHover={{ scale: 1.04 }}
+              transition={{ type: "spring", stiffness: 300 }}
             >
-              <h3 className="text-2xl text-white font-semibold mb-2">Cloud Transformation</h3>
-              <p className="text-white/80 mb-4">
-                Migrate, manage, and optimize your infrastructure with robust cloud solutions.
-              </p>
-              <Link href="/services" className="bg-blue-500 text-white px-4 py-2 rounded font-bold hover:bg-blue-400 w-max">Cloud Services</Link>
+              <ShieldCheckIcon className="w-12 h-12 text-yellow-300 mb-3" />
+              <h3 className="text-xl font-semibold text-white mb-2">Blockchain Solutions</h3>
+              <p className="text-white/80 mb-2">Unlock transparency and trust with blockchain apps for finance, health, supply chain, and more.</p>
             </motion.div>
             <motion.div
-              className="bg-navy-dark rounded-lg shadow-md p-6 flex flex-col justify-between transition-transform duration-300 hover:scale-105 hover:shadow-blue-500/30"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              className="bg-navy-dark rounded-xl p-6 shadow-lg flex flex-col items-center text-center border border-blue-900"
+              whileHover={{ scale: 1.04 }}
+              transition={{ type: "spring", stiffness: 300 }}
             >
-              <h3 className="text-2xl text-white font-semibold mb-2">Consulting & Strategy</h3>
-              <p className="text-white/80 mb-4">
-                Align your tech roadmap and business vision with expert guidance and agile processes.
-              </p>
-              <Link href="/services" className="bg-blue-500 text-white px-4 py-2 rounded font-bold hover:bg-blue-400 w-max">Consult Us</Link>
+              <UsersIcon className="w-12 h-12 text-pink-400 mb-3" />
+              <h3 className="text-xl font-semibold text-white mb-2">Experience Design</h3>
+              <p className="text-white/80 mb-2">Delight users and drive results with seamless, human-centered interfaces and journeys.</p>
             </motion.div>
           </div>
         </section>
 
-        {/* Animated Section */}
-        <AnimatedSection />
-
-        {/* Portfolio Section */}
-        <section className="mb-10">
-          <h2 className="text-3xl text-blue-400 font-bold mb-6 text-center">Our Portfolio</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <motion.div className="bg-navy-dark rounded-lg shadow-md p-6"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+        {/* Showcase / Call to Action */}
+        <section className="max-w-5xl mx-auto px-4 pb-20">
+          <motion.div
+            className="bg-gradient-to-r from-blue-900/90 via-purple-800/70 to-blue-700/80 rounded-2xl shadow-2xl px-10 py-14 text-center border border-blue-900"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl font-bold text-white mb-4">See Our Work in Action</h2>
+            <p className="text-white/80 text-lg mb-8">Explore our portfolio to discover how we help organizations like yours achieve breakthrough results.</p>
+            <a
+              href="/portfolio"
+              className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:from-blue-400 hover:to-purple-400 transition text-lg"
             >
-              <h3 className="text-xl text-white font-semibold mb-2">Project Alpha</h3>
-              <p className="text-white/80">Scalable SaaS business analytics platform with AI-driven insights.</p>
-            </motion.div>
-            <motion.div className="bg-navy-dark rounded-lg shadow-md p-6"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <h3 className="text-xl text-white font-semibold mb-2">Beta Mobile</h3>
-              <p className="text-white/80">Cross-platform mobile productivity app with blockchain-based security.</p>
-            </motion.div>
-            <motion.div className="bg-navy-dark rounded-lg shadow-md p-6"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-            >
-              <h3 className="text-xl text-white font-semibold mb-2">Gamma AI</h3>
-              <p className="text-white/80">AI-powered enterprise automation for process efficiency.</p>
-            </motion.div>
-            <motion.div className="bg-navy-dark rounded-lg shadow-md p-6"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <h3 className="text-xl text-white font-semibold mb-2">Delta Cloud</h3>
-              <p className="text-white/80">Full cloud migration & optimization for a fintech startup.</p>
-            </motion.div>
-          </div>
-          <div className="flex justify-center mt-6">
-            <Link href="/portfolio" className="bg-blue-500 text-white px-6 py-2 rounded font-bold hover:bg-blue-400">View All Projects</Link>
-          </div>
+              View Portfolio <ArrowRightIcon className="w-5 h-5 inline ml-2" />
+            </a>
+          </motion.div>
         </section>
-
-        {/* Testimonials Section */}
-        <section className="my-12 px-4 max-w-3xl mx-auto">
-          <h2 className="text-3xl text-blue-400 font-bold mb-6 text-center">What Our Clients Say</h2>
-          <div className="grid gap-8 md:grid-cols-2">
-            <motion.blockquote
-              className="bg-navy-dark rounded-lg p-6 shadow text-white/90"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              “Cognitron transformed our workflow and helped us scale. Highly recommended!”
-              <footer className="mt-4 text-blue-300 font-semibold">— Alex, CEO at FinTechCo</footer>
-            </motion.blockquote>
-            <motion.blockquote
-              className="bg-navy-dark rounded-lg p-6 shadow text-white/90"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-            >
-              “Professional, creative, and always on time. Our go-to tech partner.”
-              <footer className="mt-4 text-blue-300 font-semibold">— Maria, Founder at HealthSync</footer>
-            </motion.blockquote>
-          </div>
-        </section>
-
-        {/* Animated Call to Action */}
-        <AnimatedCTA />
-
       </main>
       <Footer />
     </div>
