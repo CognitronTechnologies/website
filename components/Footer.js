@@ -1,15 +1,10 @@
 export default function Footer() {
   return (
-    <footer className="w-full bg-navy-dark text-white py-6 flex flex-col items-center">
-      <div className="mb-2">&copy; {new Date().getFullYear()} Cognitron. All rights reserved.</div>
-      <div className="flex gap-4">
-        <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">Twitter</a>
-        <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">LinkedIn</a>
-        <a href="/privacy" className="hover:text-blue-400">Privacy Policy</a>
-      </div>
-      <div className="mt-2 text-xs text-gray-400">
-        cognitron.tech
+    <footer className="bg-navy-dark text-white/80 py-6 px-4 text-center mt-16">
+      &copy; {new Date().getFullYear()} Cognitron. All rights reserved.
+      <div className="mt-2 text-xs">
+        <span>Email: hello@cognitron.com</span> &bull; <span>Phone: +1 234 567 8901</span>
       </div>
     </footer>
-  );
+  )
 }
