@@ -45,28 +45,28 @@ export default function About() {
 
         {/* Our Philosophy */}
         <motion.section
-          className="grid md:grid-cols-2 gap-8 mb-8"
+          className="grid gap-8 md:grid-cols-2 mb-8"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <div className="bg-navy-dark rounded-2xl shadow-lg p-8 flex flex-col">
+          <div className="bg-navy-dark rounded-2xl shadow-lg p-6 sm:p-8 flex flex-col">
             <div className="flex items-center gap-3 mb-3">
               <LightBulbIcon className="w-8 h-8 text-yellow-300" />
-              <h2 className="text-xl font-bold text-white">Our Philosophy</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-white">Our Philosophy</h2>
             </div>
-            <p className="text-white/80 text-lg">
+            <p className="text-white/80 text-base sm:text-lg">
               We put people first. Every solution we craft is grounded in empathy and the desire to make technology delightful and accessible. 
               We’re relentless learners—exploring the frontier of what’s possible so you can stay ahead.
             </p>
           </div>
-          <div className="bg-navy-dark rounded-2xl shadow-lg p-8 flex flex-col">
+          <div className="bg-navy-dark rounded-2xl shadow-lg p-6 sm:p-8 flex flex-col">
             <div className="flex items-center gap-3 mb-3">
               <RocketLaunchIcon className="w-8 h-8 text-purple-400" />
-              <h2 className="text-xl font-bold text-white">What We Do</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-white">What We Do</h2>
             </div>
-            <p className="text-white/80 text-lg">
+            <p className="text-white/80 text-base sm:text-lg">
               From AI-powered automation to secure blockchain solutions and scalable cloud platforms, we help businesses reimagine what’s possible. 
               Our team partners with you every step of the way, making your vision a reality—with measurable impact.
             </p>
@@ -75,7 +75,7 @@ export default function About() {
 
         {/* Values */}
         <motion.section
-          className="bg-navy-dark rounded-2xl shadow-lg p-8 mb-8"
+          className="bg-navy-dark rounded-2xl shadow-lg p-6 sm:p-8 mb-8"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -83,9 +83,9 @@ export default function About() {
         >
           <div className="flex items-center gap-3 mb-3">
             <HeartIcon className="w-8 h-8 text-pink-400" />
-            <h2 className="text-2xl font-bold text-white">Our Core Values</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white">Our Core Values</h2>
           </div>
-          <ul className="text-white/80 text-lg grid gap-3 md:grid-cols-2 list-none pl-0">
+          <ul className="text-white/80 text-base sm:text-lg grid gap-3 md:grid-cols-2 list-none pl-0">
             <li>
               <span className="text-blue-300 font-semibold">Empathy:</span> We care deeply about user and client experiences.
             </li>
@@ -111,7 +111,7 @@ export default function About() {
         >
           <a
             href="/contact"
-            className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:from-blue-400 hover:to-purple-400 transition text-lg"
+            className="inline-block w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:from-blue-400 hover:to-purple-400 transition text-base sm:text-lg"
           >
             Let’s Build Something Amazing Together
           </a>

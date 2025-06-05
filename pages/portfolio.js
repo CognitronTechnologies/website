@@ -3,7 +3,7 @@ import Footer from '../components/Footer'
 import { BriefcaseIcon, ArrowTopRightOnSquareIcon, CpuChipIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
 
-// Example data, replace with your real projects or fetch from your CMS
+// Placeholder data
 const projects = [
   {
     name: "FinTrust AI Analytics",
@@ -46,11 +46,11 @@ export default function Portfolio() {
             Real solutions. Real impact. See how we help businesses grow, innovate, and delight their users.
           </p>
         </motion.div>
-        <section className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+        <section className="grid gap-8 sm:gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project, idx) => (
             <motion.div
               key={project.name}
-              className="bg-navy-dark rounded-2xl shadow-lg flex flex-col overflow-hidden border border-blue-900 hover:shadow-2xl transition-shadow"
+              className="bg-navy-dark rounded-2xl shadow-lg flex flex-col overflow-hidden border border-blue-900 hover:shadow-2xl transition-shadow w-full"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -60,19 +60,20 @@ export default function Portfolio() {
                 <img
                   src={project.image}
                   alt={project.name}
-                  className="w-full h-48 object-cover object-center"
+                  className="w-full h-40 sm:h-48 object-cover object-center"
                 />
               )}
-              <div className="p-6 flex-1 flex flex-col">
+              <div className="p-4 sm:p-6 flex-1 flex flex-col">
                 <div className="flex items-center mb-2 gap-2">
-                  <BriefcaseIcon className="w-6 h-6 text-blue-400" />
-                  <h2 className="text-2xl text-white font-semibold">{project.name}</h2>
+                  <BriefcaseIcon className="w-5 sm:w-6 h-5 sm:h-6 text-blue-400" />
+                  <h2 className="text-lg sm:text-2xl text-white font-semibold">{project.name}</h2>
                 </div>
-                <p className="text-white/80 mb-4 flex-1">{project.description}</p>
+                <p className="text-white/80 mb-4 flex-1 text-sm sm:text-base">{project.description}</p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {project.tech.map((tech) => (
-                    <span key={tech} className="inline-flex items-center px-3 py-1 rounded-full bg-blue-900/70 text-blue-200 text-sm font-medium">
-                      <CpuChipIcon className="w-4 h-4 mr-1 text-blue-400" />
+                    <span key={tech} className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full bg-blue-900/70 text-blue-200 text-xs sm:text-sm font-medium">
+                      <CpuChipIcon className="w-3 sm:w-4 h-3 sm:h-4 mr-1 text-blue-400" />
+                      {tech}
                     </span>
                   ))}
                 </div>
@@ -80,19 +81,19 @@ export default function Portfolio() {
                   href={project.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center self-start mt-auto bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold px-4 py-2 rounded-full shadow hover:from-blue-400 hover:to-purple-400 transition"
+                  className="inline-flex items-center self-start mt-auto bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold px-4 py-2 rounded-full shadow hover:from-blue-400 hover:to-purple-400 transition text-xs sm:text-base"
                 >
                   View Project
-                  <ArrowTopRightOnSquareIcon className="w-5 h-5 ml-2" />
+                  <ArrowTopRightOnSquareIcon className="w-4 sm:w-5 h-4 sm:h-5 ml-2" />
                 </a>
               </div>
             </motion.div>
           ))}
         </section>
-        <div className="mt-16 text-center">
+        <div className="mt-10 sm:mt-16 text-center">
           <a
             href="/contact"
-            className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:from-blue-400 hover:to-purple-400 transition text-lg"
+            className="inline-block w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:from-blue-400 hover:to-purple-400 transition text-base sm:text-lg"
           >
             Start your project with us
           </a>
