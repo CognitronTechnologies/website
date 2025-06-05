@@ -43,7 +43,7 @@ export default function Home() {
         {/* Highlighted Services */}
         <section className="max-w-5xl mx-auto px-4 pb-20">
           <motion.h2
-            className="text-3xl font-bold text-blue-300 mb-8 text-center"
+            className="text-2xl sm:text-3xl font-bold text-blue-300 mb-8 text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -51,7 +51,7 @@ export default function Home() {
           >
             What We Do Best
           </motion.h2>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <motion.div
               className="bg-navy-dark rounded-xl p-6 shadow-lg flex flex-col items-center text-center border border-blue-900"
               whileHover={{ scale: 1.04 }}
@@ -94,17 +94,17 @@ export default function Home() {
         {/* Showcase / Call to Action */}
         <section className="max-w-5xl mx-auto px-4 pb-20">
           <motion.div
-            className="bg-gradient-to-r from-blue-900/90 via-purple-800/70 to-blue-700/80 rounded-2xl shadow-2xl px-10 py-14 text-center border border-blue-900"
+            className="bg-gradient-to-r from-blue-900/90 via-purple-800/70 to-blue-700/80 rounded-2xl shadow-2xl px-4 sm:px-10 py-10 sm:py-14 text-center border border-blue-900"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl font-bold text-white mb-4">See Our Work in Action</h2>
-            <p className="text-white/80 text-lg mb-8">Explore our portfolio to discover how we help organizations like yours achieve breakthrough results.</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">See Our Work in Action</h2>
+            <p className="text-white/80 text-base sm:text-lg mb-8">Explore our portfolio to discover how we help organizations like yours achieve breakthrough results.</p>
             <a
               href="/portfolio"
-              className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:from-blue-400 hover:to-purple-400 transition text-lg"
+              className="inline-block w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:from-blue-400 hover:to-purple-400 transition text-base sm:text-lg"
             >
               View Portfolio <ArrowRightIcon className="w-5 h-5 inline ml-2" />
             </a>
