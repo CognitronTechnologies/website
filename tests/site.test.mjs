@@ -195,6 +195,31 @@ test('no root file matches Vercel server entrypoint detection', async () => {
   assert.equal(config.outputDirectory, 'dist');
 });
 
+test('Vercel builds include Web Analytics; local builds omit it', async () => {
+  const { analyticsEnabled } = await import('../build.mjs');
+  assert.equal(analyticsEnabled({}), false);
+  assert.equal(analyticsEnabled({ VERCEL: '1' }), true);
+  assert.equal(analyticsEnabled({ VERCEL: '1', ENABLE_ANALYTICS: '0' }), false);
+  assert.equal(analyticsEnabled({ ENABLE_ANALYTICS: '1' }), true);
+  const original = process.env.VERCEL;
+  try {
+    process.env.VERCEL = '1';
+    await buildSite();
+    for (const file of ['index.html', 'services/cloud-infrastructure/index.html', 'industries/education/index.html', '404.html']) {
+      const html = await readFile(new URL(`../dist/${file}`, import.meta.url), 'utf8');
+      assert.match(html, /<script defer src="\/_vercel\/insights\/script\.js"><\/script><\/head>/, file);
+      assert.equal((html.match(/_vercel\/insights/g) || []).length, 1, file);
+    }
+    delete process.env.VERCEL;
+    await buildSite();
+    assert.doesNotMatch(await readFile(new URL('../dist/index.html', import.meta.url), 'utf8'), /_vercel\/insights/);
+  } finally {
+    if (original === undefined) delete process.env.VERCEL;
+    else process.env.VERCEL = original;
+    await buildSite();
+  }
+});
+
 test('production build contains only public files and Vercel redirects match preview', async () => {
   await buildSite();
   for (const path of pages.keys()) {

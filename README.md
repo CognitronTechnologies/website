@@ -55,7 +55,11 @@ Never commit `.env.local`. Both local start and build load it if present; set th
 
 Without sender credentials, the contact page explicitly offers email drafts only. With credentials, it also offers **Send enquiry**. A success message appears only when Resend accepts the request and returns an ID. Acceptance is not an inbox-delivery guarantee. A retry of unchanged details reuses an idempotency key. Failure preserves the form and leaves the draft/copy option available.
 
-The draft button never submits enquiry data, opens an email app automatically, or claims to send. The prepared message can be copied or opened by a separate action. Form contents are not saved to browser storage. No analytics, advertising cookies, booking scripts, or external fonts are loaded.
+The draft button never submits enquiry data, opens an email app automatically, or claims to send. The prepared message can be copied or opened by a separate action. Form contents are not saved to browser storage. No advertising cookies, booking scripts, or external fonts are loaded.
+
+## Analytics
+
+Vercel Web Analytics (cookie-free) is added at build time on Vercel deployments only, using Vercel's plain-HTML snippet (`/_vercel/insights/script.js`). The `@vercel/analytics/next` React component is for Next.js apps and does not apply to this static site. Enable **Analytics** for the project in the Vercel dashboard, then redeploy. Set `ENABLE_ANALYTICS=0` in Vercel to switch it off, or `ENABLE_ANALYTICS=1` to force it into a local build. Update the Privacy page if the analytics configuration changes.
 
 ### Abuse controls and operational limits
 
