@@ -1,0 +1,56 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": false,
+  "trailingSlash": true,
+  "redirects": [
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/privacy.html", "destination": "/privacy/", "permanent": true },
+    { "source": "/services/operations.html", "destination": "/services/integration-automation/", "permanent": true },
+    { "source": "/services/customer-experience.html", "destination": "/services/software-development/", "permanent": true },
+    { "source": "/services/dependability.html", "destination": "/services/modernisation-support/", "permanent": true },
+    { "source": "/services", "destination": "/services/", "permanent": true },
+    { "source": "/industries", "destination": "/industries/", "permanent": true },
+    { "source": "/approach", "destination": "/approach/", "permanent": true },
+    { "source": "/about", "destination": "/about/", "permanent": true },
+    { "source": "/contact", "destination": "/contact/", "permanent": true },
+    { "source": "/privacy", "destination": "/privacy/", "permanent": true },
+    { "source": "/services/software-development", "destination": "/services/software-development/", "permanent": true },
+    { "source": "/services/cloud-infrastructure", "destination": "/services/cloud-infrastructure/", "permanent": true },
+    { "source": "/services/integration-automation", "destination": "/services/integration-automation/", "permanent": true },
+    { "source": "/services/ai-solutions", "destination": "/services/ai-solutions/", "permanent": true },
+    { "source": "/services/data-business-intelligence", "destination": "/services/data-business-intelligence/", "permanent": true },
+    { "source": "/services/modernisation-support", "destination": "/services/modernisation-support/", "permanent": true },
+    { "source": "/industries/finance-fintech", "destination": "/industries/finance-fintech/", "permanent": true },
+    { "source": "/industries/insurance", "destination": "/industries/insurance/", "permanent": true },
+    { "source": "/industries/procurement-supply-chain", "destination": "/industries/procurement-supply-chain/", "permanent": true },
+    { "source": "/industries/compliance-risk", "destination": "/industries/compliance-risk/", "permanent": true },
+    { "source": "/industries/healthcare", "destination": "/industries/healthcare/", "permanent": true },
+    { "source": "/industries/education", "destination": "/industries/education/", "permanent": true },
+    { "source": "/industries/retail-ecommerce", "destination": "/industries/retail-ecommerce/", "permanent": true },
+    { "source": "/industries/logistics-transport", "destination": "/industries/logistics-transport/", "permanent": true },
+    { "source": "/industries/agriculture", "destination": "/industries/agriculture/", "permanent": true },
+    { "source": "/industries/public-sector-non-profit", "destination": "/industries/public-sector-non-profit/", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/services/", "destination": "/services/index.html" },
+    { "source": "/services/:slug/", "destination": "/services/:slug/index.html" },
+    { "source": "/industries/", "destination": "/industries/index.html" },
+    { "source": "/industries/:slug/", "destination": "/industries/:slug/index.html" },
+    { "source": "/approach/", "destination": "/approach/index.html" },
+    { "source": "/about/", "destination": "/about/index.html" },
+    { "source": "/contact/", "destination": "/contact/index.html" },
+    { "source": "/privacy/", "destination": "/privacy/index.html" }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+      { "key": "X-Frame-Options", "value": "DENY" }
+    ] },
+    { "source": "/fonts/(.*)", "headers": [
+      { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+    ] }
+  ]
+}

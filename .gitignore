@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.vercel/
+.env
+.env.local
+.env.*.local
+# Internal planning documents: keep local, never publish
+agency-positioning.md
+website-plan.md
+site-review.md
