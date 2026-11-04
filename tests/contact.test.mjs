@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { createSiteServer } from '../server.mjs';
+import { createSiteServer } from '../preview.mjs';
 import { createContactHandler } from '../api/contact.mjs';
 
 const env = { RESEND_API_KEY: 'test-key-not-real', RESEND_FROM_EMAIL: 'Website <test@example.test>', CONTACT_NOTIFICATION_EMAIL: 'inbox@example.test' };

@@ -30,9 +30,9 @@ The build produces 23 core pages, a legacy information landing page, assets, a 4
 - [site.mjs](site.mjs): shared header/footer and page templates, public route manifest, legacy redirects.
 - [styles.css](styles.css): responsive visual system: dark hero and footer bands, warm off-white content, a single chartreuse accent (`--volt`) used only as a fill, Geist and Geist Mono typography, pill buttons, and rounded cards. No gradients or external font requests.
 - [fonts/](fonts/): self-hosted Geist variable fonts (SIL Open Font License 1.1; see [fonts/LICENSE.md](fonts/LICENSE.md)).
-- [app.js](app.js): mobile navigation, enquiry prefill, validation, optional sending, and explicit draft/copy fallback.
+- [main.js](main.js): mobile navigation, enquiry prefill, validation, optional sending, and explicit draft/copy fallback.
 - [api/contact.mjs](api/contact.mjs): Resend delivery with server validation, origin/token checks, body limits, idempotency, honeypot, bounded timeouts, and per-instance attempt limits.
-- [server.mjs](server.mjs): local public-route preview server.
+- [preview.mjs](preview.mjs): local public-route preview server.
 - [build.mjs](build.mjs): static export and redirect-parity check.
 - [vercel.json](vercel.json): build settings, public rewrites, legacy redirects, and response headers.
 
