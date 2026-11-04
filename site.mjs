@@ -15,13 +15,23 @@ const serviceLinks = (slugs) => slugs.map((slug) => {
   return link(servicePath(service), service.short);
 }).join('');
 
+function navPanel(id, label, overview, items, wide) {
+  return `<div class="nav-panel${wide ? ' nav-panel-wide' : ''}" id="${id}"><div class="nav-panel-inner"><ul>${items.join('')}</ul><a class="nav-panel-all" href="${overview}">${e(label)} <span aria-hidden="true">→</span></a></div></div>`;
+}
+
 function header(path) {
+  const current = (href) => path === href ? ' aria-current="page"' : path.startsWith(href) ? ' aria-current="true"' : '';
+  const group = (href, text, panelId, panel) => `<div class="nav-group"><a href="${href}"${current(href)}>${text}</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="${panelId}" aria-label="Show ${text.toLowerCase()}" hidden><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg></button>${panel}</div>`;
+  const servicePanel = navPanel('menu-services', 'All services', '/services/', services.map((service) => `<li><a href="${servicePath(service)}"><strong>${e(service.name)}</strong><span>${e(service.summary)}</span></a></li>`), true);
+  const industryPanel = navPanel('menu-industries', 'All industries', '/industries/', industries.map((industry) => `<li><a href="${industryPath(industry)}">${e(industry.name)}</a></li>`), false);
   return `<a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header"><div class="header-inner">
     <a class="wordmark" href="/" aria-label="COGNITRON home">${mark}<span>cognitron<span class="brand-dot">.</span></span></a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="navigation" hidden>Menu <span aria-hidden="true">+</span></button>
     <nav id="navigation" aria-label="Main navigation">
-      ${[['/services/', 'Services'], ['/industries/', 'Industries'], ['/approach/', 'Our approach'], ['/about/', 'About']].map(([href, text]) => `<a href="${href}"${path === href ? ' aria-current="page"' : path.startsWith(href) ? ' aria-current="true"' : ''}>${text}</a>`).join('')}
+      ${group('/services/', 'Services', 'menu-services', servicePanel)}
+      ${group('/industries/', 'Industries', 'menu-industries', industryPanel)}
+      <a href="/approach/"${current('/approach/')}>Our approach</a><a href="/about/"${current('/about/')}>About</a>
       <a class="nav-contact" href="/contact/"${path === '/contact/' ? ' aria-current="page"' : ''}>Discuss your project ${arrow}</a>
     </nav>
   </div></header>`;

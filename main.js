@@ -19,10 +19,36 @@ if (toggle && navigation) {
     if (event.target.closest('a') && mobile.matches) reset();
   });
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && mobile.matches && !navigation.hidden) {
+    if (event.key === 'Escape' && mobile.matches && !navigation.hidden && !navigation.querySelector('.nav-toggle[aria-expanded="true"]')) {
       reset();
       toggle.focus();
     }
+  });
+}
+
+const navToggles = [...document.querySelectorAll('.nav-toggle')];
+const closePanels = (except) => navToggles.forEach((button) => { if (button !== except) button.setAttribute('aria-expanded', 'false'); });
+navToggles.forEach((button) => {
+  button.hidden = false;
+  button.addEventListener('click', () => {
+    const open = button.getAttribute('aria-expanded') !== 'true';
+    closePanels(button);
+    button.setAttribute('aria-expanded', String(open));
+  });
+});
+if (navToggles.length) {
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.nav-group')) closePanels();
+  });
+  document.addEventListener('keydown', (event) => {
+    const open = navToggles.find((button) => button.getAttribute('aria-expanded') === 'true');
+    if (event.key === 'Escape' && open) {
+      closePanels();
+      open.focus();
+    }
+  });
+  document.addEventListener('focusin', (event) => {
+    if (!event.target.closest('.nav-group')) closePanels();
   });
 }
 
