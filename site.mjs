@@ -15,13 +15,23 @@ const serviceLinks = (slugs) => slugs.map((slug) => {
   return link(servicePath(service), service.short);
 }).join('');
 
+function navPanel(id, label, overview, items, wide) {
+  return `<div class="nav-panel${wide ? ' nav-panel-wide' : ''}" id="${id}"><div class="nav-panel-inner"><ul>${items.join('')}</ul><a class="nav-panel-all" href="${overview}">${e(label)} <span aria-hidden="true">→</span></a></div></div>`;
+}
+
 function header(path) {
+  const current = (href) => path === href ? ' aria-current="page"' : path.startsWith(href) ? ' aria-current="true"' : '';
+  const group = (href, text, panelId, panel) => `<div class="nav-group"><a href="${href}"${current(href)}>${text}</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="${panelId}" aria-label="Show ${text.toLowerCase()}" hidden><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg></button>${panel}</div>`;
+  const servicePanel = navPanel('menu-services', 'All services', '/services/', services.map((service) => `<li><a href="${servicePath(service)}"><strong>${e(service.name)}</strong><span>${e(service.summary)}</span></a></li>`), true);
+  const industryPanel = navPanel('menu-industries', 'All industries', '/industries/', industries.map((industry) => `<li><a href="${industryPath(industry)}">${e(industry.name)}</a></li>`), false);
   return `<a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header"><div class="header-inner">
     <a class="wordmark" href="/" aria-label="COGNITRON home">${mark}<span>cognitron<span class="brand-dot">.</span></span></a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="navigation" hidden>Menu <span aria-hidden="true">+</span></button>
     <nav id="navigation" aria-label="Main navigation">
-      ${[['/services/', 'Services'], ['/industries/', 'Industries'], ['/approach/', 'Our approach'], ['/about/', 'About']].map(([href, text]) => `<a href="${href}"${path === href ? ' aria-current="page"' : path.startsWith(href) ? ' aria-current="true"' : ''}>${text}</a>`).join('')}
+      ${group('/services/', 'Services', 'menu-services', servicePanel)}
+      ${group('/industries/', 'Industries', 'menu-industries', industryPanel)}
+      <a href="/approach/"${current('/approach/')}>Our approach</a><a href="/about/"${current('/about/')}>About</a>
       <a class="nav-contact" href="/contact/"${path === '/contact/' ? ' aria-current="page"' : ''}>Discuss your project ${arrow}</a>
     </nav>
   </div></header>`;
@@ -54,8 +64,17 @@ function cta(title = 'What are you working on?', text = 'Tell us what needs to c
   return `<section class="closing"><div class="wrap closing-inner"><div><h2>${e(title)}</h2><p>${e(text)}</p></div>${button(href, 'Let’s talk')}</div></section>`;
 }
 
-function serviceList() {
-  return `<div class="service-list">${services.map((service, index) => `<a class="service-entry" href="${servicePath(service)}"><span class="entry-number">0${index + 1}</span><div><h3>${e(service.name)}</h3><p>${e(service.summary)}</p></div><span class="entry-arrow" aria-hidden="true">↗</span></a>`).join('')}</div>`;
+const serviceArt = {
+  'software-development': '<rect x="40" y="18" width="160" height="104" rx="10"/><path d="M40 40h160"/><circle cx="54" cy="29" r="3"/><circle cx="65" cy="29" r="3"/><circle cx="76" cy="29" r="3"/><path d="M60 62l-12 12 12 12M92 62l12 12-12 12"/><path d="M122 62h44M122 76h30M122 90h38"/><rect class="art-accent" x="152" y="70" width="8" height="12" rx="1"/>',
+  'cloud-infrastructure': '<path d="M120 22 196 54 120 86 44 54Z" class="art-accent-fill"/><path d="M44 72 120 104 196 72"/><path d="M44 90 120 122 196 90"/><path d="M44 54v36M196 54v36"/>',
+  'integration-automation': '<rect x="28" y="44" width="52" height="52" rx="12"/><rect x="160" y="44" width="52" height="52" rx="12"/><path d="M80 70h80"/><path d="M148 62l12 8-12 8"/><circle class="art-accent-fill" cx="120" cy="70" r="12"/><path d="M42 62h24M42 72h16M174 62h24M174 72h18"/>',
+  'ai-solutions': '<rect x="36" y="22" width="112" height="96" rx="10"/><path d="M52 42h80M52 56h64M52 84h72M52 98h56"/><rect class="art-accent-fill" x="50" y="64" width="84" height="12" rx="3"/><circle cx="170" cy="86" r="22"/><path d="M186 102l16 16"/>',
+  'data-business-intelligence': '<path d="M40 118h168M40 118V22"/><rect x="56" y="80" width="22" height="38" rx="3"/><rect x="92" y="60" width="22" height="58" rx="3"/><rect class="art-accent-fill" x="128" y="40" width="22" height="78" rx="3"/><rect x="164" y="70" width="22" height="48" rx="3"/><path d="M58 70 103 48 139 30 175 54"/>',
+  'modernisation-support': '<rect x="30" y="36" width="70" height="70" rx="10" stroke-dasharray="5 5"/><rect class="art-accent-fill" x="140" y="36" width="70" height="70" rx="10"/><path d="M106 71h28"/><path d="M124 63l10 8-10 8"/><path d="M152 60h46M152 72h34M152 84h40"/><path d="M44 60h42M44 72h28M44 84h36"/>',
+};
+
+function serviceList(withArt = false) {
+  return `<div class="service-list${withArt ? ' service-list-art' : ''}">${services.map((service, index) => `<a class="service-entry" href="${servicePath(service)}"><span class="entry-number">0${index + 1}</span><span class="entry-arrow" aria-hidden="true">↗</span>${withArt ? `<svg class="service-art" viewBox="0 0 240 140" aria-hidden="true">${serviceArt[service.slug]}</svg>` : ''}<div><h3>${e(service.name)}</h3><p>${e(service.summary)}</p></div></a>`).join('')}</div>`;
 }
 
 function architecture() {
@@ -67,12 +86,12 @@ function architecture() {
 }
 
 function home() {
-  const body = `<section class="home-hero"><div class="wrap">${label('Software, cloud & AI services')}
+  const body = `<section class="home-hero"><div class="hero-visual" aria-hidden="true"><canvas id="hero-globe"></canvas></div><div class="wrap">${label('Software, cloud & AI services')}
     <div class="hero-heading"><h1>Better software.<br><span>Stronger systems.</span></h1></div>
     <div class="hero-bottom"><p>We build digital products, improve cloud infrastructure, and connect the systems your business depends on, from the first decision to what happens after launch.</p><div class="hero-actions">${button()}${link('/services/', 'Explore our services')}</div></div>
     <div class="hero-footline"><span>From product to platform</span><ul aria-label="Cloud platforms"><li>AWS</li><li>Microsoft Azure</li><li>Google Cloud</li></ul></div>
   </div></section>
-  <section id="outcomes" class="section wrap"><div class="section-heading"><h2>Six services, one delivery team.</h2><p>One project needs a new application. Another needs better connections between the tools you already use. Start with the problem; we bring the right specialists.</p></div>${serviceList()}</section>
+  <section id="outcomes" class="section wrap"><div class="section-heading"><h2>Six services, one delivery team.</h2><p>One project needs a new application. Another needs better connections between the tools you already use. Start with the problem; we bring the right specialists.</p></div>${serviceList(true)}</section>
   <section id="fieldnotes" class="feature-section"><div class="wrap feature-layout"><div><h2>A better product needs more than a good interface.</h2><p>A customer portal depends on the systems behind it: identity, integrations, reliable infrastructure, and information people can trust.</p><p>We design those pieces together, so the application and the environment it runs in are never two separate projects.</p>${link('/approach/', 'See how we work')}</div>${architecture()}</div></section>
   <section class="section wrap"><div class="section-heading"><h2>Industries we work in.</h2><p>Each sector has its own users, systems, and rules. See what we build for yours.</p></div><div class="industry-index">${industries.map((industry) => `<a href="${industryPath(industry)}">${e(industry.name)} ${arrow}</a>`).join('')}</div></section>
   <section id="approach" class="approach-section section"><div class="wrap"><div class="section-heading"><h2>Four ways to work with us.</h2></div><div class="engagement-grid">${engagements.map(([name, summary]) => `<article><h3>${e(name)}</h3><p>${e(summary)}</p></article>`).join('')}</div>${link('/approach/', 'How each one works')}</div></section>
@@ -181,9 +200,9 @@ function aboutPage() {
 }
 
 function contactPage() {
-  return layout('/contact/', 'Contact', 'Discuss your software, cloud, integration or AI project with COGNITRON. Send an enquiry when online delivery is enabled, or prepare an email draft.',
+  return layout('/contact/', 'Contact', 'Discuss your software, cloud, integration or AI project with the COGNITRON team.',
     `${pageHero('Contact', 'Tell us what you are planning.', 'An outline is enough. Tell us what needs to change, what you already use, and any timing constraints.', null)}
-    <section class="wrap contact-layout"><aside><h2>A conversation, not a sales funnel.</h2><p>Our team reviews your outline and brings the right specialists to the first conversation. We’ll discuss the context, whether we are a good fit, and a sensible next step. Paid work starts only once we have both agreed it.</p><a class="contact-address" href="mailto:dickson@cognitron.tech">dickson@cognitron.tech ${arrow}</a><div class="contact-disclosure"><h3>How this form works</h3><p id="delivery-disclosure">You can prepare an email on your device. Nothing is sent until you send it from your email app.</p></div></aside>
+    <section class="wrap contact-layout"><aside><h2>What happens next.</h2><p>Our team reviews your outline and brings the right specialists to the first conversation. We’ll clarify your priorities, discuss any technical constraints, and identify a practical next step.</p><p>Prefer email? Reach us directly.</p><a class="contact-address" href="mailto:dickson@cognitron.tech">dickson@cognitron.tech ${arrow}</a></aside>
     <form id="enquiry-form"><h2>A little about the project.</h2><p id="form-help">Required fields are marked *. Please leave out credentials, customer records, and sensitive information.</p>
     <div class="form-row"><label>Your name *<input name="name" autocomplete="name" required maxlength="100"></label><label>Work email *<input name="email" type="email" autocomplete="email" required maxlength="254"></label></div>
     <label>Organisation <span class="optional">optional</span><input name="organisation" autocomplete="organization" maxlength="160"></label>
@@ -192,18 +211,18 @@ function contactPage() {
     <label>What needs to change? *<textarea name="challenge" rows="6" required minlength="10" maxlength="3000" aria-describedby="form-help" placeholder="The situation today, what you would like to improve, and any constraints…"></textarea></label>
     <div class="form-trap" aria-hidden="true"><label>Leave this field empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
     <p class="form-privacy">We use these details only to respond to your enquiry. ${link('/privacy/', 'Privacy & data')}</p>
-    <div class="draft-actions"><button id="send-enquiry" class="button" type="submit" value="send" hidden>Send enquiry ${arrow}</button><button id="enquiry-submit" class="secondary-button" type="submit" value="draft" hidden>Prepare an email draft</button></div>
-    <noscript><p>This form needs JavaScript to prepare a draft. You can email <a href="mailto:dickson@cognitron.tech">dickson@cognitron.tech</a> directly instead. No message has been sent.</p></noscript>
+    <button id="send-enquiry" class="button" type="submit" disabled>Send enquiry ${arrow}</button>
+    <noscript><p>This form needs JavaScript to send an enquiry. You can email <a href="mailto:dickson@cognitron.tech">dickson@cognitron.tech</a> directly instead.</p></noscript>
     <p id="form-status" role="status" aria-live="polite"></p>
-    <div id="email-fallback" class="email-fallback" hidden><h3>Your draft is ready. It has not been sent.</h3><p>Open your email app, or copy the message and send it to dickson@cognitron.tech. Your form stays here if you need to make changes.</p><label>Prepared message<textarea id="email-preview" rows="10" readonly></textarea></label><div class="draft-actions"><a id="open-email" class="button" href="mailto:dickson@cognitron.tech">Open email app ${arrow}</a><button type="button" id="copy-message" class="secondary-button">Copy message</button></div><p id="copy-status" role="status"></p></div></form></section>`);
+    </form></section>`);
 }
 
 function privacyPage() {
-  return layout('/privacy/', 'Privacy & data', 'How COGNITRON handles website visits, email drafts, and enquiries submitted through Resend. No analytics or advertising cookies.',
+  return layout('/privacy/', 'Privacy & data', 'How COGNITRON handles website visits, cookie-free analytics, and enquiries submitted through Resend. No advertising trackers.',
     `${pageHero('Privacy & data · Updated 4 November 2026', 'A clear starting point.', 'This notice covers the Cognitron website and initial enquiries. For questions about your information, email dickson@cognitron.tech.', null)}
-    <div class="wrap legal-content prose"><h2>What happens in the enquiry form</h2><p>The email-draft option prepares a message locally in your browser. It does not submit your fields, save them in browser storage, or automatically open your email app. You choose whether to copy the message or open a draft and send it through your own provider.</p><p>When online sending is configured, a separate Send enquiry button is shown. Using it submits your name, email, optional organisation and selections, and project outline to our delivery endpoint. The message is passed to Resend to send to our enquiry mailbox. A confirmation means the email service accepted the message, not that it has been read or guaranteed delivered.</p><p>Please do not include passwords, customer records, financial records, health information, or other sensitive project data.</p>
+    <div class="wrap legal-content prose"><h2>What happens in the enquiry form</h2><p>Send enquiry submits your name, email, optional organisation and selections, and project outline to our delivery endpoint. The message is passed to Resend to send to our enquiry mailbox. A confirmation means the email service accepted the message, not that it has been read or guaranteed delivered. Form contents are not saved in browser storage.</p><p>Please do not include passwords, customer records, financial records, health information, or other sensitive project data.</p>
     <h2>When you send an email</h2><p>We receive what you include, such as your name, email address, organisation, and project outline. We use this information to respond, discuss a possible engagement, and maintain relevant business correspondence. The email providers involved process the message under their own terms.</p>
-    <h2>Website services</h2><p>The site does not use analytics, advertising trackers, site-set cookies, or browser storage. Typography uses fonts served from this website; no external font service is requested. The hosting provider may process standard request information, such as IP addresses and browser details, to serve and protect the website. The enquiry endpoint uses short-lived, hashed network identifiers in memory to limit repeated attempts. It does not keep a separate database of enquiry messages.</p><p>Resend processes submitted messages under its <a href="https://resend.com/legal/privacy-policy">privacy policy</a>. Website hosting and email processing may involve other jurisdictions; appropriate project-data arrangements are agreed separately before sensitive operational information is shared.</p>
+    <h2>Website services</h2><p>We use Vercel Web Analytics to understand which pages are visited. It does not use cookies or browser storage. It records the page viewed, the referring site, and general browser, operating system, device type, and country information. Visitors are counted using a hash of the request that resets daily and is not used to identify individuals across days. We do not use advertising trackers.</p><p>Typography uses fonts served from this website; no external font service is requested. The hosting provider may process standard request information, such as IP addresses and browser details, to serve and protect the website. The enquiry endpoint uses short-lived, hashed network identifiers in memory to limit repeated attempts. It does not keep a separate database of enquiry messages.</p><p>Resend processes submitted messages under its <a href="https://resend.com/legal/privacy-policy">privacy policy</a>. Website hosting and email processing may involve other jurisdictions; appropriate project-data arrangements are agreed separately before sensitive operational information is shared.</p>
     <h2>Booking</h2><p>There is no embedded booking calendar on this version of the website. Arrange a conversation by email. This notice will be updated before a booking service is introduced.</p>
     <h2>Retention and your choices</h2><p>We retain relevant enquiry correspondence as needed to handle the conversation, maintain business records, and meet applicable obligations. You can ask about access, correction, or deletion by emailing <a href="mailto:dickson@cognitron.tech">dickson@cognitron.tech</a>. We will consider the request under applicable law and explain any information we need to retain.</p>
     <h2>Before sharing project data</h2><p>Initial contact is not a secure project-data transfer process. We agree appropriate access, handling, responsibilities, and any cross-border arrangements before receiving operational data for an engagement.</p>${link('/contact/', 'Contact Cognitron')}</div>`);

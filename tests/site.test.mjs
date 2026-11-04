@@ -164,11 +164,12 @@ test('public copy avoids defensive and internal-policy phrasing', () => {
   }
 });
 
-test('contact offers truthful, explicit draft and online delivery states', () => {
+test('contact offers a single send action and accessible delivery status', () => {
   const html = pages.get('/contact/');
-  assert.match(html, /Nothing is sent until you send it from your email app/);
-  assert.match(html, /id="send-enquiry"[^>]+hidden/);
-  assert.match(html, /id="enquiry-submit"/);
+  assert.match(html, /What happens next/);
+  assert.doesNotMatch(html, /sales funnel|How this form works|Paid work starts/);
+  assert.doesNotMatch(html, /draft|email-fallback|copy-message|delivery-disclosure/);
+  assert.match(html, /id="send-enquiry"[^>]+disabled/);
   assert.match(html, /id="form-status" role="status"/);
   assert.match(html, /<noscript>/);
   assert.match(html, /name="website" tabindex="-1"/);
@@ -195,6 +196,31 @@ test('no root file matches Vercel server entrypoint detection', async () => {
   assert.equal(config.outputDirectory, 'dist');
 });
 
+test('Vercel builds include Web Analytics; local builds omit it', async () => {
+  const { analyticsEnabled } = await import('../build.mjs');
+  assert.equal(analyticsEnabled({}), false);
+  assert.equal(analyticsEnabled({ VERCEL: '1' }), true);
+  assert.equal(analyticsEnabled({ VERCEL: '1', ENABLE_ANALYTICS: '0' }), false);
+  assert.equal(analyticsEnabled({ ENABLE_ANALYTICS: '1' }), true);
+  const original = process.env.VERCEL;
+  try {
+    process.env.VERCEL = '1';
+    await buildSite();
+    for (const file of ['index.html', 'services/cloud-infrastructure/index.html', 'industries/education/index.html', '404.html']) {
+      const html = await readFile(new URL(`../dist/${file}`, import.meta.url), 'utf8');
+      assert.match(html, /<script defer src="\/_vercel\/insights\/script\.js"><\/script><\/head>/, file);
+      assert.equal((html.match(/_vercel\/insights/g) || []).length, 1, file);
+    }
+    delete process.env.VERCEL;
+    await buildSite();
+    assert.doesNotMatch(await readFile(new URL('../dist/index.html', import.meta.url), 'utf8'), /_vercel\/insights/);
+  } finally {
+    if (original === undefined) delete process.env.VERCEL;
+    else process.env.VERCEL = original;
+    await buildSite();
+  }
+});
+
 test('production build contains only public files and Vercel redirects match preview', async () => {
   await buildSite();
   for (const path of pages.keys()) {
@@ -203,7 +229,7 @@ test('production build contains only public files and Vercel redirects match pre
   }
   const config = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
   for (const [source, destination] of redirects) assert.ok(config.redirects.some((rule) => rule.source === source && rule.destination === destination), source);
-  assert.match(await readFile(new URL('../dist/contact/index.html', import.meta.url), 'utf8'), /Prepare an email draft/);
+  assert.match(await readFile(new URL('../dist/contact/index.html', import.meta.url), 'utf8'), /Send enquiry/);
   assert.ok((await stat(new URL('../dist/styles.css', import.meta.url))).size < 50000);
   assert.ok((await stat(new URL('../dist/main.js', import.meta.url))).size < 20000);
 });
