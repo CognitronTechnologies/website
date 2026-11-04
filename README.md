@@ -30,7 +30,7 @@ The build produces 23 core pages, a legacy information landing page, assets, a 4
 - [site.mjs](site.mjs): shared header/footer and page templates, public route manifest, legacy redirects.
 - [styles.css](styles.css): responsive visual system: dark hero and footer bands, warm off-white content, a single chartreuse accent (`--volt`) used only as a fill, Geist and Geist Mono typography, pill buttons, and rounded cards. No gradients or external font requests.
 - [fonts/](fonts/): self-hosted Geist variable fonts (SIL Open Font License 1.1; see [fonts/LICENSE.md](fonts/LICENSE.md)).
-- [main.js](main.js): mobile navigation, enquiry prefill, validation, optional sending, and explicit draft/copy fallback.
+- [main.js](main.js): mobile navigation, enquiry prefill, validation, and sending.
 - [api/contact.mjs](api/contact.mjs): Resend delivery with server validation, origin/token checks, body limits, idempotency, honeypot, bounded timeouts, and per-instance attempt limits.
 - [preview.mjs](preview.mjs): local public-route preview server.
 - [build.mjs](build.mjs): static export and redirect-parity check.
@@ -53,9 +53,11 @@ SITE_URL=<final public origin when deploying>
 
 Never commit `.env.local`. Both local start and build load it if present; set the same values through Vercel's environment settings for deployment.
 
-Without sender credentials, the contact page explicitly offers email drafts only. With credentials, it also offers **Send enquiry**. A success message appears only when Resend accepts the request and returns an ID. Acceptance is not an inbox-delivery guarantee. A retry of unchanged details reuses an idempotency key. Failure preserves the form and leaves the draft/copy option available.
+The contact form has one **Send enquiry** action, enabled when JavaScript loads. Delivery configuration and a fresh session token are requested when submitting, not on page load. Missing credentials or connection failures are reported only after a submission attempt and preserve the form for retry. A success message appears only when Resend accepts the request and returns an ID. Acceptance is not an inbox-delivery guarantee. A retry of unchanged details reuses an idempotency key.
 
-The draft button never submits enquiry data, opens an email app automatically, or claims to send. The prepared message can be copied or opened by a separate action. Form contents are not saved to browser storage. No advertising cookies, booking scripts, or external fonts are loaded.
+The configured form supports submission with Enter. The contact sidebar explains the team's next step rather than form mechanics.
+
+Form contents are not saved to browser storage. No advertising cookies, booking scripts, or external fonts are loaded.
 
 ## Analytics
 
@@ -83,9 +85,9 @@ For a preview deployment, leave `SITE_URL` unset to disallow indexing. Add it fo
 
 ## Verification
 
-`npm test` covers public/private routes, redirects and query preservation, all internal links and fragments, unique metadata and IDs, service/industry coverage, explicit draft states, static export, validation, origin/session checks, size limits, provider failure, rate limiting, and retry idempotency.
+`npm test` covers public/private routes, redirects and query preservation, all internal links and fragments, unique metadata and IDs, service/industry coverage, the single contact action, static export, validation, origin/session checks, size limits, provider failure, rate limiting, and retry idempotency.
 
-Also check Home, Cloud, Industries, and Contact in a browser at 320, 390, 768, 1024, and 1440 CSS pixels; keyboard navigation, 200% zoom, reduced motion, draft/copy, sending success/failure, and no-JavaScript reading. The website plan defines release performance and accessibility targets; automated route tests alone do not prove them.
+Also check Home, Cloud, Industries, and Contact in a browser at 320, 390, 768, 1024, and 1440 CSS pixels; keyboard navigation, 200% zoom, reduced motion, sending success/failure, and no-JavaScript reading. The website plan defines release performance and accessibility targets; automated route tests alone do not prove them.
 
 For an optional local mobile audit with Chrome installed:
 
