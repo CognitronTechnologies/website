@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
-import { createSiteServer } from '../server.mjs';
+import { createSiteServer } from '../preview.mjs';
 import { createPages, redirects } from '../site.mjs';
 import { services, industries } from '../content.mjs';
 import { serviceDetails, industryDetails } from '../detail-content.mjs';
@@ -19,13 +19,13 @@ async function withServer(run) {
 test('all core pages, legacy information page, and assets are served; private files are not', async () => {
   assert.equal(pages.size, 24);
   await withServer(async (base) => {
-    for (const path of [...pages.keys(), '/styles.css', '/app.js', '/favicon.svg', '/fonts/geist.woff2', '/fonts/geist-mono.woff2']) {
+    for (const path of [...pages.keys(), '/styles.css', '/main.js', '/favicon.svg', '/fonts/geist.woff2', '/fonts/geist-mono.woff2']) {
       const response = await fetch(base + path);
       assert.equal(response.status, 200, path);
       assert.ok((await response.text()).length > 100, path);
       assert.equal((await fetch(base + path, { method: 'HEAD' })).status, 200, path);
     }
-    for (const path of ['/agency-positioning.md', '/website-plan.md', '/content.mjs', '/site.mjs', '/package.json', '/server.mjs', '/.env.local', '/not-found', '/%2e%2e/package.json', '/api/anything']) {
+    for (const path of ['/agency-positioning.md', '/website-plan.md', '/content.mjs', '/site.mjs', '/package.json', '/preview.mjs', '/.env.local', '/not-found', '/%2e%2e/package.json', '/api/anything']) {
       assert.equal((await fetch(base + path)).status, 404, path);
     }
     assert.equal((await fetch(base, { method: 'POST' })).status, 405);
@@ -46,7 +46,7 @@ test('redirects preserve enquiry parameters and resolve directly', async () => {
 });
 
 test('all internal links, fragments, prefill values, and assets resolve', async () => {
-  const assets = ['/styles.css', '/app.js', '/favicon.svg', '/fonts/geist.woff2'];
+  const assets = ['/styles.css', '/main.js', '/favicon.svg', '/fonts/geist.woff2'];
   const validInterests = services.map((service) => service.slug);
   const validIndustries = industries.map((industry) => industry.slug);
   for (const [path, html] of pages) {
@@ -183,6 +183,18 @@ test('mobile navigation prevents initial shift and recovers when its script fail
   assert.match(css, /\.js \.menu-toggle\[aria-expanded="false"\]\+#navigation/);
 });
 
+test('no root file matches Vercel server entrypoint detection', async () => {
+  const { readdir } = await import('node:fs/promises');
+  const detected = /^(app|server|index)\.(js|mjs|cjs|ts|mts|cts)$/;
+  for (const dir of ['../', '../src/']) {
+    const entries = await readdir(new URL(dir, import.meta.url)).catch(() => []);
+    assert.deepEqual(entries.filter((name) => detected.test(name)), [], `${dir} contains a file Vercel would run as a server`);
+  }
+  const config = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
+  assert.equal(config.framework, null);
+  assert.equal(config.outputDirectory, 'dist');
+});
+
 test('production build contains only public files and Vercel redirects match preview', async () => {
   await buildSite();
   for (const path of pages.keys()) {
@@ -193,7 +205,7 @@ test('production build contains only public files and Vercel redirects match pre
   for (const [source, destination] of redirects) assert.ok(config.redirects.some((rule) => rule.source === source && rule.destination === destination), source);
   assert.match(await readFile(new URL('../dist/contact/index.html', import.meta.url), 'utf8'), /Prepare an email draft/);
   assert.ok((await stat(new URL('../dist/styles.css', import.meta.url))).size < 50000);
-  assert.ok((await stat(new URL('../dist/app.js', import.meta.url))).size < 20000);
+  assert.ok((await stat(new URL('../dist/main.js', import.meta.url))).size < 20000);
 });
 
 test('public origin enables canonical links and sitemap; preview builds remove production metadata', async () => {

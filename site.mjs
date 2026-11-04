@@ -42,7 +42,7 @@ function layout(path, title, description, body) {
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111110"><title>${e(title)} — COGNITRON</title><meta name="description" content="${e(description)}">
 <meta property="og:title" content="${e(title)} — COGNITRON"><meta property="og:description" content="${e(description)}"><meta property="og:type" content="website">
-<script>document.documentElement.classList.add('js')</script><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preload" href="/fonts/geist.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/styles.css"><script src="/app.js" defer onerror="document.documentElement.classList.remove('js')"></script></head>
+<script>document.documentElement.classList.add('js')</script><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preload" href="/fonts/geist.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/styles.css"><script src="/main.js" defer onerror="document.documentElement.classList.remove('js')"></script></head>
 <body>${header(path)}<main id="main">${body}</main>${footer()}</body></html>`;
 }
 

@@ -1,9 +1,10 @@
-import { mkdir, writeFile, copyFile, readFile } from 'node:fs/promises';
+import { mkdir, writeFile, copyFile, readFile, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { createPages, redirects, notFound, escapeHtml } from './site.mjs';
 
 export async function buildSite() {
   const pages = createPages();
+  await rm(new URL('dist/', import.meta.url), { recursive: true, force: true });
   for (const [path, html] of pages) {
     const relative = path === '/' ? 'index.html' : path.endsWith('/') ? `${path.slice(1)}index.html` : path.slice(1);
     const output = new URL(`dist/${relative}`, import.meta.url);
@@ -11,7 +12,7 @@ export async function buildSite() {
     await writeFile(output, html);
   }
   await mkdir(new URL('dist/fonts/', import.meta.url), { recursive: true });
-  for (const asset of ['styles.css', 'app.js', 'favicon.svg', 'fonts/geist.woff2', 'fonts/geist-mono.woff2', 'fonts/LICENSE.md']) await copyFile(new URL(asset, import.meta.url), new URL(`dist/${asset}`, import.meta.url));
+  for (const asset of ['styles.css', 'main.js', 'favicon.svg', 'fonts/geist.woff2', 'fonts/geist-mono.woff2', 'fonts/LICENSE.md']) await copyFile(new URL(asset, import.meta.url), new URL(`dist/${asset}`, import.meta.url));
   await writeFile(new URL('dist/404.html', import.meta.url), notFound());
   const rawUrl = process.env.SITE_URL;
   if (rawUrl) {
