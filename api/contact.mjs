@@ -117,7 +117,15 @@ export function createContactHandler({ env = process.env, fetchImpl = fetch, now
         signal: AbortSignal.timeout(10000),
       });
       if (!result.ok) {
-        console.error('Resend rejected an enquiry:', result.status);
+        const rejectionText = await result.text();
+        let providerError = 'unrecognised_error';
+        try {
+          const rejection = JSON.parse(rejectionText);
+          if (typeof rejection?.name === 'string' && /^[a-z_]{1,80}$/.test(rejection.name)) providerError = rejection.name;
+        } catch (error) {
+          if (!(error instanceof SyntaxError)) throw error;
+        }
+        console.error('Resend rejected an enquiry:', result.status, providerError);
         return reply(response, 502, { error: 'The email service did not accept the enquiry. Your details are still here; try again or contact us by email.' });
       }
       const receipt = await result.json();

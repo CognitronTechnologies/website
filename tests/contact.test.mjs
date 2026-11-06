@@ -51,6 +51,17 @@ test('provider rejection, malformed receipt, and timeout do not return success',
   }
 });
 
+test('provider rejection logs status and error code without message contents', async (t) => {
+  const logs = [];
+  t.mock.method(console, 'error', (...args) => logs.push(args));
+  await withContact({ fetchImpl: async () => Response.json({ name: 'validation_error', message: 'Private provider detail' }, { status: 422 }) }, async ({ post }) => {
+    const response = await post(payload());
+    assert.equal(response.status, 502);
+    assert.deepEqual(logs, [['Resend rejected an enquiry:', 422, 'validation_error']]);
+    assert.doesNotMatch(JSON.stringify(await response.json()), /Private provider detail/);
+  });
+});
+
 test('invalid input, cross-origin requests, forged tokens, oversized bodies, and bots are rejected', async () => {
   await withContact({ fetchImpl: () => { throw new Error('Must not call provider'); } }, async ({ post, base }) => {
     assert.equal((await post(payload(), 'https://unrelated.example')).status, 403);

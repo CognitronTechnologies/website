@@ -28,7 +28,7 @@ The build produces 23 core pages, a legacy information landing page, assets, a 4
 - [content.mjs](content.mjs): services (problems and results, deliverables, starter engagement, example, FAQs), industry summaries, engagement models, and contextual links.
 - [detail-content.mjs](detail-content.mjs): service solutions, technologies, and FAQs, plus sector-specific challenges, solutions, integrations, design considerations, examples, and FAQs.
 - [site.mjs](site.mjs): shared header/footer and page templates, public route manifest, legacy redirects.
-- [styles.css](styles.css): responsive visual system: dark hero and footer bands, warm off-white content, a single chartreuse accent (`--volt`) used only as a fill, Geist and Geist Mono typography, pill buttons, and rounded cards. No gradients or external font requests.
+- [styles.css](styles.css): black-led responsive visual system with neutral light content, indigo-violet actions (`--action`) with white labels, and lavender accents (`--volt`) on dark surfaces. Homepage graphics use the same palette: a dotted sphere with fine orbital strands and dark-backed service illustrations. Geist and Geist Mono are self-hosted; graphic lighting is confined to the canvas, with no broad background gradients or external font requests. Reduced-motion preferences disable sphere animation.
 - [fonts/](fonts/): self-hosted Geist variable fonts (SIL Open Font License 1.1; see [fonts/LICENSE.md](fonts/LICENSE.md)).
 - [main.js](main.js): mobile navigation, enquiry prefill, validation, and sending.
 - [api/contact.mjs](api/contact.mjs): Resend delivery with server validation, origin/token checks, body limits, idempotency, honeypot, bounded timeouts, and per-instance attempt limits.
@@ -70,6 +70,8 @@ The handler requires an allowed browser origin and a short-lived signed form tok
 Instance-local limits are not a distributed production rate limiter. Configure Vercel Firewall/WAF rate limiting for `/api/contact` before public launch, and set Resend account quotas/alerts. Do not treat the signed form token or honeypot as comprehensive bot prevention.
 
 The endpoint is limited to the configured mailbox; visitors cannot choose a recipient. Enquiry bodies are not logged. No real email is sent by automated tests; provider acceptance/rejection and timeouts are mocked.
+
+For rejected sends, Vercel runtime logs record `Resend rejected an enquiry:` followed by the provider HTTP status and error name. Provider messages, email addresses, and credentials are not logged. Use Resend API Logs for the detailed rejection reason.
 
 ## Vercel
 

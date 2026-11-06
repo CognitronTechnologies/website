@@ -63,6 +63,10 @@ const globe = document.querySelector('#hero-globe');
 const globeContext = globe && globe.getContext('2d');
 if (globeContext) {
   const ctx = globeContext;
+  const palette = getComputedStyle(document.documentElement);
+  const violet = palette.getPropertyValue('--action').trim();
+  const lavender = palette.getPropertyValue('--volt').trim();
+  const highlight = palette.getPropertyValue('--volt-hover').trim();
   const still = matchMedia('(prefers-reduced-motion: reduce)');
   // Fixed directions give the planet the same "landmasses" on every visit.
   const seeds = [[0.8, 0.3, 0.5, 1], [-0.4, 0.9, 0.1, 0.7], [0.2, -0.6, 0.77, 0.9], [-0.7, -0.2, -0.68, 0.8], [0.5, 0.5, -0.7, 0.6], [-0.1, 0.2, 0.97, 1.1]];
@@ -94,10 +98,19 @@ if (globeContext) {
     const cx = width / 2;
     const cy = height / 2;
     const r = width * 0.42;
+    // Fine orbital strands frame the sphere without adding a background glow.
+    for (let strand = 0; strand < 24; strand++) {
+      ctx.globalAlpha = 0.12 + (strand % 6) * 0.035;
+      ctx.strokeStyle = strand % 7 === 0 ? highlight : strand % 3 === 0 ? lavender : violet;
+      ctx.lineWidth = strand % 7 === 0 ? 1.2 : 0.7;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r * (1.04 + strand * 0.009), r * (0.48 + strand * 0.006), -0.48 + turn * 0.15, 0, Math.PI * 2);
+      ctx.stroke();
+    }
     const body = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.4, r * 0.1, cx, cy, r);
-    body.addColorStop(0, '#262622');
-    body.addColorStop(0.7, '#161614');
-    body.addColorStop(1, '#121211');
+    body.addColorStop(0, '#25212f');
+    body.addColorStop(0.7, '#17151c');
+    body.addColorStop(1, '#111110');
     ctx.globalAlpha = 1;
     ctx.fillStyle = body;
     ctx.beginPath();
@@ -118,25 +131,27 @@ if (globeContext) {
       const px = cx + x1 * r;
       const py = cy + y1 * r;
       if (type === 2) {
-        ctx.fillStyle = '#d4f04a';
+        ctx.fillStyle = highlight;
         ctx.globalAlpha = 0.45 + light * 0.55;
         ctx.fillRect(px - 2, py - 2, 4, 4);
       } else if (type === 1) {
-        ctx.fillStyle = '#f4f4f0';
+        ctx.fillStyle = lavender;
         ctx.globalAlpha = 0.18 + light * 0.82;
         ctx.fillRect(px - 1.5, py - 1.5, 3, 3);
       } else {
-        ctx.fillStyle = '#f4f4f0';
+        ctx.fillStyle = violet;
         ctx.globalAlpha = 0.05 + light * 0.14;
         ctx.fillRect(px - 0.7, py - 0.7, 1.4, 1.4);
       }
     }
     ctx.globalAlpha = 1;
-    ctx.strokeStyle = 'rgba(244,244,240,.14)';
+    ctx.strokeStyle = lavender;
+    ctx.globalAlpha = 0.18;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(cx, cy, r + 0.5, 0, Math.PI * 2);
     ctx.stroke();
+    ctx.globalAlpha = 1;
   };
   const tick = (time) => {
     if (!running) return;
@@ -259,7 +274,7 @@ if (form) {
       const result = await response.json();
       if (!response.ok || result.accepted !== true || typeof result.reference !== 'string') throw new Error(result.error || 'The email service did not confirm acceptance.');
       accepted = true;
-      status.textContent = 'Thank you. Your enquiry has been accepted for sending.';
+      status.textContent = 'Thank you for reaching out. Your enquiry has been received and someone on our team will get back to you within one business day.';
     } catch (error) {
       console.error('Enquiry submission failed:', error.name);
       status.textContent = error.name === 'TimeoutError' || error.name === 'TypeError'

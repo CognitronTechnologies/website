@@ -9,6 +9,19 @@ import { buildSite } from '../build.mjs';
 
 const pages = createPages();
 
+test('violet theme separates white-label actions from lavender graphic accents', async () => {
+  const css = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
+  const client = await readFile(new URL('../main.js', import.meta.url), 'utf8');
+  const favicon = await readFile(new URL('../favicon.svg', import.meta.url), 'utf8');
+  assert.match(css, /--action:#6250d8;--action-hover:#5140bc/);
+  assert.match(css, /--volt:#b4a4f4;--volt-hover:#ded6ff/);
+  assert.match(css, /\.button\{[^}]*background:var\(--action\);color:var\(--white\)/);
+  assert.match(css, /\.closing-inner\{[^}]*background:var\(--ink\)/);
+  assert.match(client, /getPropertyValue\('--action'\)/);
+  assert.match(client, /ctx\.ellipse/);
+  assert.doesNotMatch(css + client + favicon, /#d4f04a|#e2f87d/i);
+});
+
 async function withServer(run) {
   const server = createSiteServer();
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
