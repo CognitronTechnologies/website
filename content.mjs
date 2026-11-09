@@ -2,7 +2,7 @@ export const services = [
   {
     slug: 'software-development', name: 'Digital Products & Custom Software', short: 'Software development',
     headline: 'Software built for the job it actually has to do',
-    summary: 'Web and mobile applications, customer portals, and internal tools built around real users and the systems behind them — not just pretty screens.',
+    summary: 'Web and mobile applications, customer portals, and internal tools built around real users and the systems behind them.',
     lead: 'A new product or a better way to deliver an existing service. We help you decide what to build, design how it should work, and turn it into software your team can own and run.',
     problems: [
       ['You have a product idea but need to test the real scope before committing a large budget.', 'A working prototype and a realistic first-release plan.'],

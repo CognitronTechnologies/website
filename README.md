@@ -33,6 +33,7 @@ The build produces 23 core pages, a legacy information landing page, assets, a 4
 - [detail-content.mjs](detail-content.mjs): service solutions, technologies, and FAQs, plus sector-specific challenges, solutions, integrations, release checks, examples, starter assessments, closing invitations, and FAQs.
 - [site.mjs](site.mjs): shared header/footer and page templates, public route manifest, legacy redirects.
 - [styles.css](styles.css): black-led responsive visual system with neutral light content, indigo-violet actions (`--action`) with white labels, and lavender accents (`--volt`) on dark surfaces. Homepage graphics use the same palette: a dotted sphere with fine orbital strands and dark-backed service illustrations. Geist and Geist Mono are self-hosted; graphic lighting is confined to the canvas, with no broad background gradients or external font requests. Reduced-motion preferences disable sphere animation.
+
 - [fonts/](fonts/): self-hosted Geist variable fonts (SIL Open Font License 1.1; see [fonts/LICENSE.md](fonts/LICENSE.md)).
 - [main.js](main.js): mobile navigation, enquiry prefill, validation, and sending.
 - [api/contact.mjs](api/contact.mjs): Resend delivery with server validation, origin/token checks, body limits, idempotency, honeypot, bounded timeouts, and per-instance attempt limits.
@@ -40,7 +41,9 @@ The build produces 23 core pages, a legacy information landing page, assets, a 4
 - [build.mjs](build.mjs): static export and redirect-parity check.
 - [vercel.json](vercel.json): build settings, public rewrites, legacy redirects, and response headers.
 
-HTML is generated into `dist`, not edited by hand. The templates replace the previous root HTML and four outcome-led service files. Old URLs remain supported by redirects and the dedicated legacy information page. Homepage anchors and the four old interest values are preserved.
+The homepage flows from the dark hero to light services, a full-width stone industry section, dark engagement models, and light team content. The former architecture pitch and diagram have been removed.
+
+HTML is generated into `dist`, not edited by hand. The templates replace the previous root HTML and four outcome-led service files. Old URLs remain supported by redirects and the dedicated legacy information page. The remaining homepage anchors and the four old interest values are preserved.
 
 ## Enquiry delivery
 

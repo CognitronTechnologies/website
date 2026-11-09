@@ -92,7 +92,15 @@ test('pages have consistent accessible landmarks and unique meaningful metadata'
   }
   assert.equal(titles.size, pages.size);
   assert.equal(descriptions.size, pages.size);
-  for (const id of ['outcomes', 'approach', 'fieldnotes', 'about', 'contact']) assert.ok(pages.get('/').includes(`id="${id}"`));
+  for (const id of ['outcomes', 'approach', 'about', 'contact']) assert.ok(pages.get('/').includes(`id="${id}"`));
+});
+
+test('homepage omits the architecture pitch and keeps a full-width stone industry section', () => {
+  const html = pages.get('/');
+  assert.doesNotMatch(html, /The screen is only half the job|A customer submits a request|A better-looking portal|See how we work|class="architecture"|id="fieldnotes"/);
+  assert.match(html, /<section class="feature-section"><div class="section wrap"><div class="section-heading"><h2>What could we build for your industry/);
+  assert.ok(html.indexOf('id="outcomes"') < html.indexOf('class="industry-index"'));
+  assert.ok(html.indexOf('class="industry-index"') < html.indexOf('id="approach"'));
 });
 
 test('six distinct services, ten industry contexts, and honest evidence are visible', () => {
@@ -150,7 +158,7 @@ test('audience-led copy reaches shared summaries, service pages, and contextual 
 
 test('expanded Services menu uses the supplied messaging blurbs verbatim', () => {
   const summaries = [
-    'Web and mobile applications, customer portals, and internal tools built around real users and the systems behind them — not just pretty screens.',
+    'Web and mobile applications, customer portals, and internal tools built around real users and the systems behind them.',
     'Architecture, migration, identity, and operations on AWS, Azure, and Google Cloud that your team can actually run.',
     'Connect the tools you already use so data stops living in inboxes and spreadsheets.',
     'Practical AI that fits into existing workflows, with clear human review points. No science projects.',
