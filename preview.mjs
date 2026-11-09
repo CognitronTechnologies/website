@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { createPages, redirects, notFound } from './site.mjs';
 import contact from './api/contact.mjs';
 
-const assets = new Map([['/styles.css', 'text/css; charset=utf-8'], ['/app.js', 'text/javascript; charset=utf-8'], ['/favicon.svg', 'image/svg+xml'], ['/fonts/geist.woff2', 'font/woff2'], ['/fonts/geist-mono.woff2', 'font/woff2']]);
+const assets = new Map([['/styles.css', 'text/css; charset=utf-8'], ['/main.js', 'text/javascript; charset=utf-8'], ['/favicon.svg', 'image/svg+xml'], ['/fonts/geist.woff2', 'font/woff2'], ['/fonts/geist-mono.woff2', 'font/woff2']]);
 
 export function createSiteServer({ contactHandler = contact } = {}) {
   const pages = createPages();

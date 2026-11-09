@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { createSiteServer } from '../server.mjs';
+import { createSiteServer } from '../preview.mjs';
 import { createContactHandler } from '../api/contact.mjs';
 
 const env = { RESEND_API_KEY: 'test-key-not-real', RESEND_FROM_EMAIL: 'Website <test@example.test>', CONTACT_NOTIFICATION_EMAIL: 'inbox@example.test' };
@@ -49,6 +49,17 @@ test('provider rejection, malformed receipt, and timeout do not return success',
       assert.ok(result.error);
     });
   }
+});
+
+test('provider rejection logs status and error code without message contents', async (t) => {
+  const logs = [];
+  t.mock.method(console, 'error', (...args) => logs.push(args));
+  await withContact({ fetchImpl: async () => Response.json({ name: 'validation_error', message: 'Private provider detail' }, { status: 422 }) }, async ({ post }) => {
+    const response = await post(payload());
+    assert.equal(response.status, 502);
+    assert.deepEqual(logs, [['Resend rejected an enquiry:', 422, 'validation_error']]);
+    assert.doesNotMatch(JSON.stringify(await response.json()), /Private provider detail/);
+  });
 });
 
 test('invalid input, cross-origin requests, forged tokens, oversized bodies, and bots are rejected', async () => {

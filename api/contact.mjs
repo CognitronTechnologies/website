@@ -72,7 +72,7 @@ export function createContactHandler({ env = process.env, fetchImpl = fetch, now
     }
     if (request.method !== 'POST') return reply(response, 405, { error: 'Method not allowed.' }, { Allow: 'GET, POST' });
     if (!origin || !origins.has(origin)) return reply(response, 403, { error: 'Please submit the enquiry from this website.' });
-    if (!enabled) return reply(response, 503, { error: 'Online sending is not configured. Please use the email draft option.' });
+    if (!enabled) return reply(response, 503, { error: 'Sending is unavailable. Please contact us by email.' });
     if (!/^application\/json(?:;|$)/i.test(request.headers['content-type'] || '')) return reply(response, 415, { error: 'Please send a JSON enquiry.' });
 
     const ip = isLocal ? request.socket?.remoteAddress || 'local' : String(request.headers['x-forwarded-for'] || 'unknown').split(',')[0].trim();
@@ -95,7 +95,7 @@ export function createContactHandler({ env = process.env, fetchImpl = fetch, now
       return reply(response, 400, { error: 'The enquiry could not be read. Please try again.' });
     }
     if (!data || typeof data !== 'object' || Array.isArray(data)) return reply(response, 400, { error: 'Please provide the enquiry fields.' });
-    if (!validToken(data.token, origin, env.RESEND_API_KEY, time)) return reply(response, 403, { error: 'This form session has expired. Refresh the page before trying again, or use the email draft.' });
+    if (!validToken(data.token, origin, env.RESEND_API_KEY, time)) return reply(response, 403, { error: 'This form session has expired. Refresh the page before trying again, or contact us by email.' });
     for (const field of ['name', 'email', 'organisation', 'interest', 'industry', 'challenge', 'website', 'requestId']) {
       if (typeof data[field] !== 'string') return reply(response, 400, { error: 'Please complete the enquiry fields.' });
     }
@@ -117,18 +117,26 @@ export function createContactHandler({ env = process.env, fetchImpl = fetch, now
         signal: AbortSignal.timeout(10000),
       });
       if (!result.ok) {
-        console.error('Resend rejected an enquiry:', result.status);
-        return reply(response, 502, { error: 'The email service did not accept the enquiry. Your details are still here; try again or use the email draft.' });
+        const rejectionText = await result.text();
+        let providerError = 'unrecognised_error';
+        try {
+          const rejection = JSON.parse(rejectionText);
+          if (typeof rejection?.name === 'string' && /^[a-z_]{1,80}$/.test(rejection.name)) providerError = rejection.name;
+        } catch (error) {
+          if (!(error instanceof SyntaxError)) throw error;
+        }
+        console.error('Resend rejected an enquiry:', result.status, providerError);
+        return reply(response, 502, { error: 'The email service did not accept the enquiry. Your details are still here; try again or contact us by email.' });
       }
       const receipt = await result.json();
       if (typeof receipt.id !== 'string' || !receipt.id) {
         console.error('Resend returned no enquiry receipt.');
-        return reply(response, 502, { error: 'We could not confirm acceptance. Use the email draft or retry with the same details.' });
+        return reply(response, 502, { error: 'We could not confirm acceptance. Contact us by email or retry with the same details.' });
       }
       return reply(response, 200, { accepted: true, reference: receipt.id });
     } catch (error) {
       console.error('Contact delivery failed:', error.name || 'Unknown error');
-      return reply(response, 502, { error: 'We could not confirm acceptance by the email service. Your details are still here; use the email draft or try again.' });
+      return reply(response, 502, { error: 'We could not confirm acceptance by the email service. Your details are still here; contact us by email or try again.' });
     }
   };
 }

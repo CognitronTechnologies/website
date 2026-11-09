@@ -2,7 +2,11 @@
 
 A responsive, team-led agency website with six detailed service pages, ten dedicated industry pages and their overview, Approach, About, Contact, and Privacy. Static HTML is generated from shared templates and content; the only server function is enquiry delivery through Resend.
 
-Internal references: [positioning brief](agency-positioning.md) and [website plan](website-plan.md). Do not publish these documents or the workspace root.
+Internal references: [positioning brief](agency-positioning.md), [messaging brief](messaging.md), [industry messaging guide](industry-pages-messaging.md), and [website plan](website-plan.md). Do not publish these documents or the workspace root.
+
+The expanded Services menu uses the six service blurbs from the messaging brief verbatim. These shared summaries also appear on the homepage, services overview, and service-page metadata. All six service pages use the brief's headlines, subheads, problems, examples, and starter descriptions; detailed solution and technology copy follows the supplied text where available. Homepage hero and services introduction, shared closing copy, engagement summaries, delivery principles, and About introduction and founder framing also use the supplied wording. Supporting FAQs and technical detail remain where the brief does not provide replacements.
+
+The homepage, six services, ten industries, Approach, About, and Contact use audience-led copy: lead with a recognisable problem or useful outcome, name the work and deliverables, and explain technical decisions in plain language. Service summaries are shared across navigation, overview pages, and metadata; each service has its own closing invitation. Industry headlines, subheads, challenges, solution lists, examples, and measures follow the industry messaging guide, with only limited adaptations for page structure, credit-decision ownership, transaction handling, and stationary driver use. Supporting integrations, release checks, FAQs, and scoped assessments explain delivery without replacing the supplied messaging. Examples remain illustrative scenarios, not client results. Privacy disclosures and enquiry delivery messages retain their factual detail.
 
 ## Local development
 
@@ -25,14 +29,14 @@ The build produces 23 core pages, a legacy information landing page, assets, a 4
 
 ## Source structure
 
-- [content.mjs](content.mjs): services (problems and results, deliverables, starter engagement, example, FAQs), industry summaries, engagement models, and contextual links.
-- [detail-content.mjs](detail-content.mjs): service solutions, technologies, and FAQs, plus sector-specific challenges, solutions, integrations, design considerations, examples, and FAQs.
+- [content.mjs](content.mjs): services (problems and results, deliverables, starter engagement, example, FAQs, and closing invitation), industry summaries, engagement models, and contextual links.
+- [detail-content.mjs](detail-content.mjs): service solutions, technologies, and FAQs, plus sector-specific challenges, solutions, integrations, release checks, examples, starter assessments, closing invitations, and FAQs.
 - [site.mjs](site.mjs): shared header/footer and page templates, public route manifest, legacy redirects.
-- [styles.css](styles.css): responsive visual system: dark hero and footer bands, warm off-white content, a single chartreuse accent (`--volt`) used only as a fill, Geist and Geist Mono typography, pill buttons, and rounded cards. No gradients or external font requests.
+- [styles.css](styles.css): black-led responsive visual system with neutral light content, indigo-violet actions (`--action`) with white labels, and lavender accents (`--volt`) on dark surfaces. Homepage graphics use the same palette: a dotted sphere with fine orbital strands and dark-backed service illustrations. Geist and Geist Mono are self-hosted; graphic lighting is confined to the canvas, with no broad background gradients or external font requests. Reduced-motion preferences disable sphere animation.
 - [fonts/](fonts/): self-hosted Geist variable fonts (SIL Open Font License 1.1; see [fonts/LICENSE.md](fonts/LICENSE.md)).
-- [app.js](app.js): mobile navigation, enquiry prefill, validation, optional sending, and explicit draft/copy fallback.
+- [main.js](main.js): mobile navigation, enquiry prefill, validation, and sending.
 - [api/contact.mjs](api/contact.mjs): Resend delivery with server validation, origin/token checks, body limits, idempotency, honeypot, bounded timeouts, and per-instance attempt limits.
-- [server.mjs](server.mjs): local public-route preview server.
+- [preview.mjs](preview.mjs): local public-route preview server.
 - [build.mjs](build.mjs): static export and redirect-parity check.
 - [vercel.json](vercel.json): build settings, public rewrites, legacy redirects, and response headers.
 
@@ -53,9 +57,15 @@ SITE_URL=<final public origin when deploying>
 
 Never commit `.env.local`. Both local start and build load it if present; set the same values through Vercel's environment settings for deployment.
 
-Without sender credentials, the contact page explicitly offers email drafts only. With credentials, it also offers **Send enquiry**. A success message appears only when Resend accepts the request and returns an ID. Acceptance is not an inbox-delivery guarantee. A retry of unchanged details reuses an idempotency key. Failure preserves the form and leaves the draft/copy option available.
+The contact form has one **Send enquiry** action, enabled when JavaScript loads. Delivery configuration and a fresh session token are requested when submitting, not on page load. Missing credentials or connection failures are reported only after a submission attempt and preserve the form for retry. A success message appears only when Resend accepts the request and returns an ID. Acceptance is not an inbox-delivery guarantee. A retry of unchanged details reuses an idempotency key.
 
-The draft button never submits enquiry data, opens an email app automatically, or claims to send. The prepared message can be copied or opened by a separate action. Form contents are not saved to browser storage. No analytics, advertising cookies, booking scripts, or external fonts are loaded.
+The configured form supports submission with Enter. The contact sidebar explains the team's next step rather than form mechanics.
+
+Form contents are not saved to browser storage. No advertising cookies, booking scripts, or external fonts are loaded.
+
+## Analytics
+
+Vercel Web Analytics (cookie-free) is added at build time on Vercel deployments only, using Vercel's plain-HTML snippet (`/_vercel/insights/script.js`). The `@vercel/analytics/next` React component is for Next.js apps and does not apply to this static site. Enable **Analytics** for the project in the Vercel dashboard, then redeploy. Set `ENABLE_ANALYTICS=0` in Vercel to switch it off, or `ENABLE_ANALYTICS=1` to force it into a local build. Update the Privacy page if the analytics configuration changes.
 
 ### Abuse controls and operational limits
 
@@ -64,6 +74,8 @@ The handler requires an allowed browser origin and a short-lived signed form tok
 Instance-local limits are not a distributed production rate limiter. Configure Vercel Firewall/WAF rate limiting for `/api/contact` before public launch, and set Resend account quotas/alerts. Do not treat the signed form token or honeypot as comprehensive bot prevention.
 
 The endpoint is limited to the configured mailbox; visitors cannot choose a recipient. Enquiry bodies are not logged. No real email is sent by automated tests; provider acceptance/rejection and timeouts are mocked.
+
+For rejected sends, Vercel runtime logs record `Resend rejected an enquiry:` followed by the provider HTTP status and error name. Provider messages, email addresses, and credentials are not logged. Use Resend API Logs for the detailed rejection reason.
 
 ## Vercel
 
@@ -79,9 +91,9 @@ For a preview deployment, leave `SITE_URL` unset to disallow indexing. Add it fo
 
 ## Verification
 
-`npm test` covers public/private routes, redirects and query preservation, all internal links and fragments, unique metadata and IDs, service/industry coverage, explicit draft states, static export, validation, origin/session checks, size limits, provider failure, rate limiting, and retry idempotency.
+`npm test` covers public/private routes, redirects and query preservation, all internal links and fragments, unique metadata and IDs, service/industry coverage, the single contact action, static export, validation, origin/session checks, size limits, provider failure, rate limiting, and retry idempotency.
 
-Also check Home, Cloud, Industries, and Contact in a browser at 320, 390, 768, 1024, and 1440 CSS pixels; keyboard navigation, 200% zoom, reduced motion, draft/copy, sending success/failure, and no-JavaScript reading. The website plan defines release performance and accessibility targets; automated route tests alone do not prove them.
+Also check Home, Cloud, Industries, and Contact in a browser at 320, 390, 768, 1024, and 1440 CSS pixels; keyboard navigation, 200% zoom, reduced motion, sending success/failure, and no-JavaScript reading. The website plan defines release performance and accessibility targets; automated route tests alone do not prove them.
 
 For an optional local mobile audit with Chrome installed:
 
