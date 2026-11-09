@@ -277,6 +277,7 @@ svg{display:block}
 .example-layout{display:grid;grid-template-columns:1.1fr .9fr;gap:72px;align-items:start}
 .example-layout h2{margin-bottom:22px;max-width:620px}
 .example-layout>div>p:not(.eyebrow){color:var(--on-dark-muted);font-size:18px;max-width:600px}
+.example-layout>div>p+p{margin-top:20px}
 .example-steps ol{list-style:none;padding:0;display:grid;gap:8px;counter-reset:none}
 .example-steps li{display:flex;align-items:center;gap:16px;padding:16px 20px;border:1px solid var(--line-dark);border-radius:999px;font-size:19px;letter-spacing:-.01em;background:var(--ink-2)}
 .example-steps li span{font:500 12px/1 var(--mono);color:var(--volt)}

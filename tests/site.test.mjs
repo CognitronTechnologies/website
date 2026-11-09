@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
 import { createSiteServer } from '../preview.mjs';
-import { createPages, redirects } from '../site.mjs';
+import { createPages, redirects, escapeHtml } from '../site.mjs';
 import { services, industries } from '../content.mjs';
 import { serviceDetails, industryDetails } from '../detail-content.mjs';
 import { buildSite } from '../build.mjs';
@@ -38,7 +38,7 @@ test('all core pages, legacy information page, and assets are served; private fi
       assert.ok((await response.text()).length > 100, path);
       assert.equal((await fetch(base + path, { method: 'HEAD' })).status, 200, path);
     }
-    for (const path of ['/agency-positioning.md', '/website-plan.md', '/content.mjs', '/site.mjs', '/package.json', '/preview.mjs', '/.env.local', '/not-found', '/%2e%2e/package.json', '/api/anything']) {
+    for (const path of ['/agency-positioning.md', '/website-plan.md', '/messaging.md', '/industry-pages-messaging.md', '/content.mjs', '/site.mjs', '/package.json', '/preview.mjs', '/.env.local', '/not-found', '/%2e%2e/package.json', '/api/anything']) {
       assert.equal((await fetch(base + path)).status, 404, path);
     }
     assert.equal((await fetch(base, { method: 'POST' })).status, 405);
@@ -112,7 +112,7 @@ test('six distinct services, ten industry contexts, and honest evidence are visi
     assert.ok(pages.get('/industries/').includes(`href="/industries/${industry.slug}/"`));
   }
   assert.match(pages.get('/industries/'), /Insurance/);
-  assert.match(pages.get('/about/'), /more than five years at Microsoft/);
+  assert.match(pages.get('/about/'), /more than five years at Microsoft/i);
   assert.match(pages.get('/about/'), /4,000/);
 });
 
@@ -121,9 +121,94 @@ test('team positioning is site-wide; founder biography is confined to About', ()
     if (path === '/about/') continue;
     assert.doesNotMatch(html, /Dickson Mwendia|Meet the founder|Your first email goes to Dickson|4,000|Senior Knowledge Engineer/, path);
   }
-  assert.match(pages.get('/'), /Software engineers, cloud architects, designers/);
-  assert.match(pages.get('/about/'), /Different disciplines\. One delivery team/);
-  assert.match(pages.get('/contact/'), /Our team reviews your outline/);
+  assert.match(pages.get('/'), /Product, cloud, integration, data, and AI people working as one team/);
+  assert.match(pages.get('/about/'), /Specialists who stay connected/);
+  assert.match(pages.get('/contact/'), /Our team reads your outline/);
+});
+
+test('audience-led copy reaches shared summaries, service pages, and contextual calls to action', () => {
+  assert.match(pages.get('/'), /Software that works<br><span>the way your business actually runs/);
+  assert.match(pages.get('/approach/'), /Clear scope\. Visible progress\. No surprises at handover/);
+  for (const service of services) assert.equal(service.closing.title, 'Let’s talk');
+  for (const service of services) {
+    const html = pages.get(`/services/${service.slug}/`);
+    assert.ok(html.includes(escapeHtml(service.headline)), service.slug);
+    assert.ok(html.includes(service.summary), `${service.slug}: metadata`);
+    assert.ok(pages.get('/').includes(service.summary), `${service.slug}: homepage summary`);
+    assert.ok(pages.get('/services/').includes(service.summary), `${service.slug}: overview summary`);
+    assert.ok(html.includes(escapeHtml(service.closing.title)), `${service.slug}: closing title`);
+    assert.ok(html.includes(escapeHtml(service.closing.text)), `${service.slug}: closing text`);
+    assert.ok(html.includes(`href="/contact/?interest=${service.slug}"`), `${service.slug}: prefilled contact`);
+  }
+  for (const path of ['/', '/services/', '/approach/', '/about/', '/contact/', ...services.map((service) => `/services/${service.slug}/`)]) {
+    assert.doesNotMatch(pages.get(path), /Better software\.|Stronger systems\.|Six services, one delivery team\.|You always know|Different disciplines\. One delivery team\./, path);
+  }
+  assert.match(pages.get('/services/ai-solutions/'), /consequential or irreversible actions require approval/i);
+  assert.match(pages.get('/services/integration-automation/'), /60–90 minutes/);
+  assert.match(pages.get('/contact/'), /Please leave out passwords, customer records/);
+});
+
+test('expanded Services menu uses the supplied messaging blurbs verbatim', () => {
+  const summaries = [
+    'Web and mobile applications, customer portals, and internal tools built around real users and the systems behind them — not just pretty screens.',
+    'Architecture, migration, identity, and operations on AWS, Azure, and Google Cloud that your team can actually run.',
+    'Connect the tools you already use so data stops living in inboxes and spreadsheets.',
+    'Practical AI that fits into existing workflows, with clear human review points. No science projects.',
+    'Reports and dashboards your team will actually trust and maintain.',
+    'Improve what you have and put a clear owner in place after release.',
+  ];
+  assert.deepEqual(services.map((service) => service.summary), summaries);
+  for (const [path, html] of pages) {
+    const menu = html.match(/id="menu-services">([\s\S]*?)<a class="nav-panel-all"/)[1];
+    for (const summary of summaries) assert.ok(menu.includes(`<span>${escapeHtml(summary)}</span>`), `${path}: ${summary}`);
+  }
+});
+
+test('service pages and general pages retain the supplied messaging rather than substitute slogans', () => {
+  const headlines = [
+    'Software built for the job it actually has to do',
+    'Cloud infrastructure your team can actually run with confidence',
+    'Connect your systems. Cut the manual handoffs.',
+    'Put AI to work on a specific problem',
+    'Get a clear, trustworthy view of your business data',
+    'Improve the software your business already depends on',
+  ];
+  assert.deepEqual(services.map((service) => service.headline), headlines);
+  for (const service of services) {
+    const html = pages.get(`/services/${service.slug}/`);
+    const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)[1];
+    for (const text of [service.lead, service.exampleTitle, service.example, service.start.text, ...service.problems.flat(), ...service.start.outputs]) {
+      assert.ok(main.includes(escapeHtml(text)), `${service.slug}: ${text}`);
+    }
+    for (const [title, description] of serviceDetails[service.slug].solutions) {
+      assert.ok(main.includes(escapeHtml(title)));
+      assert.ok(main.includes(escapeHtml(description)));
+    }
+    assert.doesNotMatch(main, /\bundefined\b/);
+  }
+  const home = pages.get('/');
+  for (const text of [
+    'We design and build digital products, cloud platforms, and integrations that cut manual work, reduce risk, and stay maintainable after go-live.',
+    'One team for the full stack of work.',
+    'Whether you need a new customer portal, cleaner cloud infrastructure, or the glue between the systems you already pay for — we put the right specialists on it and keep decisions connected.',
+    'What’s broken or holding you back?',
+    'Tell us the context — systems, users, constraints — and we’ll tell you the sensible next step. No pitch deck required.',
+  ]) assert.ok(home.includes(escapeHtml(text)), text);
+  for (const text of [
+    'When you need a clear starting point before committing budget.',
+    'When there’s a defined project that needs to ship.',
+    'When your team needs extra firepower on a specific workstream.',
+    'When the system needs a reliable ongoing owner.',
+    'We lock priorities, acceptance criteria, and budget early. Assumptions get written down so they can’t drift.',
+    'You see progress in the actual product on a fixed cadence, not just status reports.',
+    'When priorities shift, you see the impact on scope, cost, and timeline before anything extra is started.',
+  ]) assert.ok(pages.get('/approach/').includes(escapeHtml(text)), text);
+  for (const text of [
+    'Product, cloud, integration, data, and AI people working as one team — so architecture decisions don’t get made in isolation from the people who have to run the system.',
+    'Technology that people can actually operate.',
+    'That experience made one thing obvious: a system isn’t finished when the code ships. People need to understand it, own it, and keep it running. That’s the standard we bring to every engagement.',
+  ]) assert.ok(pages.get('/about/').includes(escapeHtml(text)), text);
+  assert.ok(pages.get('/services/ai-solutions/').includes('We almost never recommend training your own model.'));
 });
 
 test('service and industry pages have substantive differentiated detail, navigation and FAQs', () => {
@@ -167,6 +252,85 @@ test('no boilerplate is shared across industry pages and no section restates ano
   assert.deepEqual(shared, [], 'Long sentences repeated across industry pages');
   assert.ok(!pages.get('/services/').includes('engagement-grid'), 'Services overview must not repeat engagement models');
   assert.ok(!pages.get('/industries/').includes('What shapes the work'), 'Industries overview must not duplicate detail pages');
+});
+
+test('industry pages preserve the supplied headlines and show a scoped starting point', () => {
+  const headlines = {
+    'finance-fintech': 'Software for financial services that keeps the controls visible',
+    insurance: 'Connect the policy, the claim, and the people handling it',
+    'procurement-supply-chain': 'Make purchasing and supplier work easier to follow',
+    'compliance-risk': 'Keep evidence, reviews, and accountability in one place',
+    healthcare: 'Better digital services around the delivery of care',
+    education: 'Learning platforms that work for learners and the people who run them',
+    'retail-ecommerce': 'Join up the storefront and the work behind every order',
+    'logistics-transport': 'Keep dispatch, delivery, and customer updates on the same record',
+    agriculture: 'Connect field records to the people who need them',
+    'public-sector-non-profit': 'Digital services that make access and accountability easier',
+  };
+  assert.match(pages.get('/industries/'), /We design and build custom portals, business applications, integrations, and dashboards/);
+  assert.equal(new Set(industries.map(({ slug }) => industryDetails[slug].closing.title)).size, industries.length);
+  assert.equal(new Set(industries.map(({ slug }) => industryDetails[slug].start.name)).size, industries.length);
+  for (const industry of industries) {
+    const detail = industryDetails[industry.slug];
+    const html = pages.get(`/industries/${industry.slug}/`);
+    const hero = html.match(/<section class="page-hero">([\s\S]*?)<\/section>/)[1];
+    assert.match(hero, /Custom software/);
+    assert.equal(detail.headline, headlines[industry.slug]);
+    assert.ok(hero.includes(`<h1>${escapeHtml(headlines[industry.slug])}</h1>`));
+    assert.ok(hero.includes(escapeHtml(industry.intro)));
+    assert.ok(html.includes(`name="description" content="${escapeHtml(industry.intro)}"`));
+    assert.ok(pages.get('/industries/').includes(escapeHtml(industry.intro)), `${industry.slug}: overview offer`);
+    assert.equal(detail.challenges.length, 3);
+    assert.equal(detail.start.outputs.length, 3);
+    assert.equal(detail.scenario.steps.length, 4);
+    for (const id of ['challenges', 'solutions', 'example', 'systems', 'considerations', 'start', 'questions']) {
+      assert.ok(html.includes(`id="${id}"`), `${industry.slug}: section ${id}`);
+      assert.ok(html.includes(`href="#${id}"`), `${industry.slug}: section link ${id}`);
+    }
+    for (const text of [detail.start.name, ...detail.start.outputs, detail.closing.title, detail.closing.text, detail.closing.action]) {
+      assert.ok(html.includes(escapeHtml(text)), `${industry.slug}: ${text}`);
+    }
+    assert.match(html, /Assessment scope and price agreed before work starts/);
+    assert.match(html, /What we measure/);
+    for (const [title, description] of detail.solutions) {
+      assert.ok(html.includes(escapeHtml(title)));
+      assert.ok(html.includes(escapeHtml(description)));
+    }
+    const example = html.match(/<section id="example"[\s\S]*?<\/section>/)[0];
+    assert.equal(detail.scenario.text.split('\n\n').length, 2, `${industry.slug}: original example paragraphs`);
+    for (const paragraph of detail.scenario.text.split('\n\n')) assert.ok(example.includes(`<p>${escapeHtml(paragraph)}</p>`));
+    assert.ok(example.includes(escapeHtml(detail.scenario.measures)));
+    const contextualLinks = [...html.matchAll(/href="(\/contact\/\?industry=[^"]+)"/g)];
+    assert.equal(contextualLinks.length, 3, `${industry.slug}: hero, assessment, and closing contact`);
+    for (const [, href] of contextualLinks) {
+      assert.equal(new URL(href, 'http://localhost').searchParams.get('industry'), industry.slug);
+    }
+    assert.ok(html.indexOf('id="example"') < html.indexOf('id="systems"'), `${industry.slug}: show the project before technical detail`);
+    for (const slug of industry.services) assert.ok(services.some((service) => service.slug === slug), `${industry.slug}: related ${slug}`);
+  }
+});
+
+test('industry examples name exceptions and preserve decision and data boundaries', () => {
+  const scenarios = {
+    'finance-fintech': /notification arrives twice or arrives late/,
+    insurance: /links it to the existing case instead of creating a duplicate/,
+    'procurement-supply-chain': /Partial deliveries stay open with a named owner/,
+    'compliance-risk': /never silently treated as approvals/,
+    healthcare: /Once the appointment is confirmed in the scheduling system/,
+    education: /progress and submissions stay consistent/,
+    'retail-ecommerce': /without creating duplicate orders or incorrect refunds/,
+    'logistics-transport': /without creating two delivery records/,
+    agriculture: /Unmatched or disputed quantities appear in a review queue/,
+    'public-sector-non-profit': /point back to the source records/,
+  };
+  for (const [slug, pattern] of Object.entries(scenarios)) assert.match(industryDetails[slug].scenario.text, pattern, slug);
+  assert.match(pages.get('/industries/finance-fintech/'), /authorised credit officer reviews the exceptions and makes the required credit decisions/);
+  assert.match(pages.get('/industries/insurance/'), /AI does not determine coverage or authorise settlement/);
+  assert.match(pages.get('/industries/healthcare/'), /Clinical notes and decisions remain outside the administrative workflow/);
+  assert.match(pages.get('/industries/education/'), /Grading and safeguarding decisions stay with staff/);
+  assert.match(pages.get('/industries/compliance-risk/'), /does not certify that the organisation meets a regulation/);
+  assert.match(pages.get('/industries/logistics-transport/'), /must not require drivers to read instructions, enter data, or respond to prompts while driving/);
+  assert.match(pages.get('/industries/public-sector-non-profit/'), /not, on its own, evidence that the programme caused an impact/);
 });
 
 test('public copy avoids defensive and internal-policy phrasing', () => {
