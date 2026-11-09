@@ -41,7 +41,7 @@ svg{display:block}
 .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 /* Dark surfaces */
-.site-header,.home-hero,.page-hero,.example-section,.approach-section,.site-footer,.deliver-outputs,.founder-name,.architecture{--focus:var(--volt)}
+.site-header,.home-hero,.page-hero,.example-section,.approach-section,.site-footer,.deliver-outputs,.founder-name{--focus:var(--volt)}
 
 /* Labels */
 .eyebrow{display:inline-flex;align-items:center;gap:10px;font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:28px}
@@ -158,29 +158,6 @@ svg{display:block}
 
 /* Feature (stone) sections */
 .feature-section{background:var(--stone)}
-.feature-layout{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;padding-block:112px}
-.feature-layout>div>p{margin-top:22px;font-size:18px}
-.feature-layout .text-link{margin-top:24px}
-
-/* Architecture diagram */
-.architecture{background:var(--ink);color:var(--on-dark);border-radius:var(--radius);padding:28px;font-size:14px}
-.architecture figcaption{display:flex;justify-content:space-between;gap:16px;font:500 12px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--on-dark-muted);padding-bottom:18px;border-bottom:1px solid var(--line-dark)}
-.architecture figcaption>span{color:var(--on-dark)}
-.arch-users{display:flex;justify-content:space-around;align-items:center;padding:22px 0;color:var(--on-dark)}
-.arch-users>span{color:var(--volt)}
-.arch-app{display:grid;gap:6px;padding:22px;border-radius:var(--radius-sm);background:var(--ink-3);border:1px solid var(--volt);color:var(--on-dark);text-align:center}
-.diagram-kicker{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
-.arch-app strong{font-size:22px;font-weight:500;letter-spacing:-.02em}
-.arch-app>span:last-child{font-size:13px}
-.arch-connect{height:28px;display:flex;justify-content:space-around}
-.arch-connect span{width:1px;background:var(--line-dark)}
-.arch-connect span:nth-child(2){display:none}
-.arch-tools{display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center}
-.arch-tools>div{border:1px solid var(--line-dark);border-radius:14px;padding:16px 8px;background:var(--ink-2)}
-.arch-tools small{display:block;font-size:13px;color:var(--on-dark-muted);margin-top:4px}
-.arch-foundation{margin-top:12px;padding:16px;border-radius:14px;border:1px dashed var(--line-dark);text-align:center}
-.arch-foundation>span{font:500 12px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--volt)}
-.arch-foundation p{font-size:13px;margin-top:8px;color:var(--on-dark-muted)}
 
 /* Industry chips (home) */
 .industry-index{display:grid;grid-template-columns:1fr 1fr;column-gap:72px;border-top:1px solid var(--line)}
@@ -401,7 +378,7 @@ label+label,.form-row+label,label+.form-row{margin-top:22px}
   .engagement-grid{grid-template-columns:1fr 1fr}
   .tech-grid{grid-template-columns:1fr 1fr}
   .deliver-layout{grid-template-columns:1fr 300px}
-  .section-heading,.feature-layout,.people-section,.split-section,.faq-section,.founder-profile,.example-layout{column-gap:48px;gap:48px}
+  .section-heading,.people-section,.split-section,.faq-section,.founder-profile,.example-layout{column-gap:48px;gap:48px}
   .closing-inner{padding:48px}
 }
 @media(max-width:900px){
@@ -427,7 +404,7 @@ label+label,.form-row+label,label+.form-row{margin-top:22px}
   .section-heading>p:not(.eyebrow){margin:18px 0 0}
   .hero-bottom{flex-direction:column;align-items:flex-start;gap:32px}
   .page-hero-bottom{flex-direction:column;align-items:flex-start;gap:28px}
-  .feature-layout,.people-section,.split-section,.faq-section,.founder-profile,.example-layout,.other-contexts,.contact-layout,.two-columns{grid-template-columns:1fr}
+  .people-section,.split-section,.faq-section,.founder-profile,.example-layout,.other-contexts,.contact-layout,.two-columns{grid-template-columns:1fr}
   .faq-section>.text-link{grid-column:1}
   .deliver-layout{grid-template-columns:1fr}
   .deliver-outputs{position:static}
@@ -468,8 +445,6 @@ label+label,.form-row+label,label+.form-row{margin-top:22px}
   .service-entry h3{font-size:24px}
   .industry-index{grid-template-columns:1fr}
   .industry-index a{font-size:19px;padding-block:16px}
-  .feature-layout{padding-block:64px}
-  .architecture{padding:20px}.architecture figcaption{flex-direction:column;gap:6px}
   .engagement-grid{grid-template-columns:1fr}
   .button{white-space:normal;text-align:left}
   .start-section>div{min-width:0}

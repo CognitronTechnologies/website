@@ -77,14 +77,6 @@ function serviceList(withArt = false) {
   return `<div class="service-list${withArt ? ' service-list-art' : ''}">${services.map((service, index) => `<a class="service-entry" href="${servicePath(service)}"><span class="entry-number">0${index + 1}</span><span class="entry-arrow" aria-hidden="true">↗</span>${withArt ? `<svg class="service-art" viewBox="0 0 240 140" aria-hidden="true">${serviceArt[service.slug]}</svg>` : ''}<div><h3>${e(service.name)}</h3><p>${e(service.summary)}</p></div></a>`).join('')}</div>`;
 }
 
-function architecture() {
-  return `<figure class="architecture"><figcaption>Example architecture <span>Customer service portal</span></figcaption><div class="arch-users">Customers <span aria-hidden="true">↓</span> Service team</div>
-    <div class="arch-app"><span class="diagram-kicker">Application</span><strong>One shared service record</strong><span>Requests · Documents · Updates</span></div>
-    <div class="arch-connect" aria-hidden="true"><span></span><span></span><span></span></div>
-    <div class="arch-tools"><div>Business systems<small>Integration & reconciliation</small></div><div>Data & reporting<small>Agreed metrics & access</small></div></div>
-    <div class="arch-foundation"><span>Cloud foundation</span><p>Identity · Deployment · Monitoring · Recovery</p></div></figure>`;
-}
-
 function home() {
   const body = `<section class="home-hero"><div class="hero-visual" aria-hidden="true"><canvas id="hero-globe"></canvas></div><div class="wrap">${label('Software, cloud & AI services')}
     <div class="hero-heading"><h1>Software that works<br><span>the way your business actually runs.</span></h1></div>
@@ -92,8 +84,7 @@ function home() {
     <div class="hero-footline"><span>Products, platforms & the connections between them</span><ul aria-label="Cloud platforms"><li>AWS</li><li>Microsoft Azure</li><li>Google Cloud</li></ul></div>
   </div></section>
   <section id="outcomes" class="section wrap"><div class="section-heading"><h2>One team for the full stack of work.</h2><p>Whether you need a new customer portal, cleaner cloud infrastructure, or the glue between the systems you already pay for — we put the right specialists on it and keep decisions connected.</p></div>${serviceList(true)}</section>
-  <section id="fieldnotes" class="feature-section"><div class="wrap feature-layout"><div><h2>The screen is only half the job.</h2><p>A customer submits a request. Can staff see it? Does it reach the right system? Can the customer check progress without calling?</p><p>We build the product and the connections behind it together, from sign-in to reporting. A better-looking portal should also mean less work behind the scenes.</p>${link('/approach/', 'See how we work')}</div>${architecture()}</div></section>
-  <section class="section wrap"><div class="section-heading"><h2>What could we build for your industry?</h2><p>Claims portals, driver apps, learning platforms, and more. Find the software and integration work relevant to your team.</p></div><div class="industry-index">${industries.map((industry) => `<a href="${industryPath(industry)}">${e(industry.name)} ${arrow}</a>`).join('')}</div></section>
+  <section class="feature-section"><div class="section wrap"><div class="section-heading"><h2>What could we build for your industry?</h2><p>Claims portals, driver apps, learning platforms, and more. Find the software and integration work relevant to your team.</p></div><div class="industry-index">${industries.map((industry) => `<a href="${industryPath(industry)}">${e(industry.name)} ${arrow}</a>`).join('')}</div></div></section>
   <section id="approach" class="approach-section section"><div class="wrap"><div class="section-heading"><h2>Four ways to work with us.</h2></div><div class="engagement-grid">${engagements.map(([name, summary]) => `<article><h3>${e(name)}</h3><p>${e(summary)}</p></article>`).join('')}</div>${link('/approach/', 'How each one works')}</div></section>
   <section id="about" class="section wrap people-section"><div><h2>Specialists who stay connected.</h2></div><div><p class="large-copy">Product, cloud, integration, data, and AI people working as one team — so architecture decisions don’t get made in isolation from the people who have to run the system.</p>${link('/about/', 'Meet Cognitron')}</div></section>
   <div id="contact">${cta()}</div>`;
