@@ -31,7 +31,7 @@ export async function buildSite() {
     await writeFile(output, finalise(html, path));
   }
   await mkdir(new URL('dist/fonts/', import.meta.url), { recursive: true });
-  for (const asset of ['styles.css', 'main.js', 'favicon.svg', 'fonts/geist.woff2', 'fonts/geist-mono.woff2', 'fonts/LICENSE.md']) await copyFile(new URL(asset, import.meta.url), new URL(`dist/${asset}`, import.meta.url));
+  for (const asset of ['styles.css', 'main.js', 'favicon.png', 'brand-mark.png', 'fonts/geist.woff2', 'fonts/geist-mono.woff2', 'fonts/LICENSE.md']) await copyFile(new URL(asset, import.meta.url), new URL(`dist/${asset}`, import.meta.url));
   await writeFile(new URL('dist/404.html', import.meta.url), finalise(notFound(), ''));
   if (origin) {
     await writeFile(new URL('dist/sitemap.xml', import.meta.url), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${[...pages.keys()].filter((path) => path !== '/services/information.html').map((path) => `<url><loc>${escapeHtml(origin + path)}</loc></url>`).join('')}</urlset>`);

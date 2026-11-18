@@ -24,6 +24,8 @@
     { "source": "/services/ai-solutions", "destination": "/services/ai-solutions/", "permanent": true },
     { "source": "/services/data-business-intelligence", "destination": "/services/data-business-intelligence/", "permanent": true },
     { "source": "/services/modernisation-support", "destination": "/services/modernisation-support/", "permanent": true },
+    { "source": "/services/cybersecurity", "destination": "/services/cybersecurity/", "permanent": true },
+    { "source": "/services/technology-strategy-consulting", "destination": "/services/technology-strategy-consulting/", "permanent": true },
     { "source": "/industries/finance-fintech", "destination": "/industries/finance-fintech/", "permanent": true },
     { "source": "/industries/insurance", "destination": "/industries/insurance/", "permanent": true },
     { "source": "/industries/procurement-supply-chain", "destination": "/industries/procurement-supply-chain/", "permanent": true },
