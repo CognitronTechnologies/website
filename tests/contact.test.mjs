@@ -39,6 +39,26 @@ test('only provider acceptance with a receipt produces success; plain text and r
   });
 });
 
+test('cybersecurity enquiries are accepted and delivered with the service name', async () => {
+  const calls = [];
+  await withContact({ fetchImpl: async (_, options) => { calls.push(JSON.parse(options.body)); return Response.json({ id: 'security-receipt' }); } }, async ({ post }) => {
+    const response = await post({ ...payload(), interest: 'cybersecurity' });
+    assert.equal(response.status, 200);
+    assert.match(calls[0].subject, /Cybersecurity/);
+    assert.match(calls[0].text, /Cybersecurity/);
+  });
+});
+
+test('technology consulting enquiries are delivered with the service name', async () => {
+  const calls = [];
+  await withContact({ fetchImpl: async (_, options) => { calls.push(JSON.parse(options.body)); return Response.json({ id: 'consulting-receipt' }); } }, async ({ post }) => {
+    const response = await post({ ...payload(), interest: 'technology-strategy-consulting' });
+    assert.equal(response.status, 200);
+    assert.match(calls[0].subject, /Technology Strategy & Consulting/);
+    assert.match(calls[0].text, /Technology Strategy & Consulting/);
+  });
+});
+
 test('provider rejection, malformed receipt, and timeout do not return success', async () => {
   for (const fetchImpl of [async () => Response.json({ error: 'no' }, { status: 422 }), async () => Response.json({}), async () => { throw new DOMException('Timed out', 'TimeoutError'); }]) {
     await withContact({ fetchImpl }, async ({ post }) => {

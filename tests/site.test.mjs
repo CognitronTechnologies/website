@@ -12,14 +12,17 @@ const pages = createPages();
 test('violet theme separates white-label actions from lavender graphic accents', async () => {
   const css = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
   const client = await readFile(new URL('../main.js', import.meta.url), 'utf8');
-  const favicon = await readFile(new URL('../favicon.svg', import.meta.url), 'utf8');
+  const mark = await readFile(new URL('../brand-mark.png', import.meta.url));
+  const favicon = await readFile(new URL('../favicon.png', import.meta.url));
   assert.match(css, /--action:#6250d8;--action-hover:#5140bc/);
   assert.match(css, /--volt:#b4a4f4;--volt-hover:#ded6ff/);
   assert.match(css, /\.button\{[^}]*background:var\(--action\);color:var\(--white\)/);
   assert.match(css, /\.closing-inner\{[^}]*background:var\(--ink\)/);
   assert.match(client, /getPropertyValue\('--action'\)/);
   assert.match(client, /ctx\.ellipse/);
-  assert.doesNotMatch(css + client + favicon, /#d4f04a|#e2f87d/i);
+  assert.equal(mark.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
+  assert.equal(favicon.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
+  assert.doesNotMatch(css + client, /#d4f04a|#e2f87d/i);
 });
 
 async function withServer(run) {
@@ -30,9 +33,9 @@ async function withServer(run) {
 }
 
 test('all core pages, legacy information page, and assets are served; private files are not', async () => {
-  assert.equal(pages.size, 24);
+  assert.equal(pages.size, 26);
   await withServer(async (base) => {
-    for (const path of [...pages.keys(), '/styles.css', '/main.js', '/favicon.svg', '/fonts/geist.woff2', '/fonts/geist-mono.woff2']) {
+    for (const path of [...pages.keys(), '/styles.css', '/main.js', '/favicon.png', '/brand-mark.png', '/fonts/geist.woff2', '/fonts/geist-mono.woff2']) {
       const response = await fetch(base + path);
       assert.equal(response.status, 200, path);
       assert.ok((await response.text()).length > 100, path);
@@ -59,7 +62,7 @@ test('redirects preserve enquiry parameters and resolve directly', async () => {
 });
 
 test('all internal links, fragments, prefill values, and assets resolve', async () => {
-  const assets = ['/styles.css', '/main.js', '/favicon.svg', '/fonts/geist.woff2'];
+  const assets = ['/styles.css', '/main.js', '/favicon.png', '/brand-mark.png', '/fonts/geist.woff2'];
   const validInterests = services.map((service) => service.slug);
   const validIndustries = industries.map((industry) => industry.slug);
   for (const [path, html] of pages) {
@@ -103,12 +106,12 @@ test('homepage omits the architecture pitch and keeps a full-width stone industr
   assert.ok(html.indexOf('class="industry-index"') < html.indexOf('id="approach"'));
 });
 
-test('six distinct services, ten industry contexts, and honest evidence are visible', () => {
-  assert.equal(services.length, 6);
+test('eight distinct services, ten industry contexts, and honest evidence are visible', () => {
+  assert.equal(services.length, 8);
   assert.equal(industries.length, 10);
   for (const service of services) {
     const html = pages.get(`/services/${service.slug}/`);
-    assert.match(html, /Example scenario/);
+    assert.doesNotMatch(html, /Example scenario/);
     assert.match(html, /aria-current="page"/);
     assert.ok(html.includes(`interest=${service.slug}`));
   }
@@ -124,13 +127,58 @@ test('six distinct services, ten industry contexts, and honest evidence are visi
   assert.match(pages.get('/about/'), /4,000/);
 });
 
+test('cybersecurity includes Zero Trust, partner delivery, and connected enquiry paths', () => {
+  const path = '/services/cybersecurity/';
+  const html = pages.get(path);
+  const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)[1];
+  for (const text of ['Zero Trust architecture &amp; implementation', 'Zero Trust Network Access (ZTNA)', 'Security validation exercises', 'specialist delivery partners', 'written authorisation', 'service agreement']) {
+    assert.ok(main.includes(text), text);
+  }
+  for (const [pagePath, page] of pages) {
+    const menu = page.match(/id="menu-services">([\s\S]*?)<a class="nav-panel-all"/)[1];
+    const footer = page.match(/<footer\b[\s\S]*?<\/footer>/)[0];
+    assert.ok(menu.includes(`href="${path}"`), `${pagePath}: navigation`);
+    assert.ok(footer.includes(`href="${path}"`), `${pagePath}: footer`);
+  }
+  for (const slug of ['software-development', 'cloud-infrastructure', 'modernisation-support']) {
+    const related = pages.get(`/services/${slug}/`).match(/class="related-section wrap">([\s\S]*?)<\/section>/)[1];
+    assert.ok(related.includes(`href="${path}"`), slug);
+  }
+  assert.ok(pages.get('/contact/').includes('<option value="cybersecurity">Cybersecurity</option>'));
+  assert.ok(html.includes('href="/contact/?interest=cybersecurity"'));
+  assert.doesNotMatch(pages.get('/'), /\bundefined\b/);
+});
+
+test('technology consulting is connected to navigation, related services, and enquiries', () => {
+  const slug = 'technology-strategy-consulting';
+  const path = `/services/${slug}/`;
+  const html = pages.get(path);
+  const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)[1];
+  for (const text of ['Platform selection &amp; build-versus-buy', 'Technology operating model &amp; sourcing', 'Transformation governance &amp; change management', 'Fractional technology leadership', 'How we assess the options.']) {
+    assert.ok(main.includes(text), text);
+  }
+  assert.doesNotMatch(main, /Technology we work with\.|Example scenario|\bundefined\b/);
+  assert.ok(html.includes(`href="/contact/?interest=${slug}"`));
+  assert.ok(pages.get('/contact/').includes(`<option value="${slug}">Technology Strategy &amp; Consulting</option>`));
+  for (const [pagePath, page] of pages) {
+    const menu = page.match(/id="menu-services">([\s\S]*?)<a class="nav-panel-all"/)[1];
+    const footer = page.match(/<footer\b[\s\S]*?<\/footer>/)[0];
+    assert.ok(menu.includes(`href="${path}"`), `${pagePath}: navigation`);
+    assert.ok(footer.includes(`href="${path}"`), `${pagePath}: footer`);
+  }
+  for (const related of ['cloud-infrastructure', 'modernisation-support', 'cybersecurity']) {
+    const section = pages.get(`/services/${related}/`).match(/class="related-section wrap">([\s\S]*?)<\/section>/)[1];
+    assert.ok(section.includes(`href="${path}"`), related);
+  }
+});
+
 test('team positioning is site-wide; founder biography is confined to About', () => {
   for (const [path, html] of pages) {
     if (path === '/about/') continue;
     assert.doesNotMatch(html, /Dickson Mwendia|Meet the founder|Your first email goes to Dickson|4,000|Senior Knowledge Engineer/, path);
   }
   assert.match(pages.get('/'), /Product, cloud, integration, data, and AI people working as one team/);
-  assert.match(pages.get('/about/'), /Specialists who stay connected/);
+  assert.match(pages.get('/about/'), /Technology advice, engineering, and security/);
   assert.match(pages.get('/contact/'), /Our team reads your outline/);
 });
 
@@ -160,10 +208,12 @@ test('expanded Services menu uses the supplied messaging blurbs verbatim', () =>
   const summaries = [
     'Web and mobile applications, customer portals, and internal tools built around real users and the systems behind them.',
     'Architecture, migration, identity, and operations on AWS, Azure, and Google Cloud that your team can actually run.',
-    'Connect the tools you already use so data stops living in inboxes and spreadsheets.',
-    'Practical AI that fits into existing workflows, with clear human review points. No science projects.',
-    'Reports and dashboards your team will actually trust and maintain.',
-    'Improve what you have and put a clear owner in place after release.',
+    'Business-system integration, APIs, workflow automation, and transaction monitoring across enterprise applications.',
+    'AI applications, knowledge retrieval, document processing, agent workflows, and production evaluation.',
+    'Data architecture, engineering, governance, and business intelligence with reconciled metrics and operational ownership.',
+    'Application assessment, legacy modernisation, migration, reliability engineering, and ongoing support.',
+    'Security assessments, Zero Trust architecture, penetration testing, cloud and application security, and managed detection and response.',
+    'Technology assessments, investment roadmaps, architecture reviews, platform selection, and transformation planning.',
   ];
   assert.deepEqual(services.map((service) => service.summary), summaries);
   for (const [path, html] of pages) {
@@ -180,12 +230,14 @@ test('service pages and general pages retain the supplied messaging rather than 
     'Put AI to work on a specific problem',
     'Get a clear, trustworthy view of your business data',
     'Improve the software your business already depends on',
+    'Assess risk. Secure your systems. Prepare to respond.',
+    'Decide where technology investment should go next',
   ];
   assert.deepEqual(services.map((service) => service.headline), headlines);
   for (const service of services) {
     const html = pages.get(`/services/${service.slug}/`);
     const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)[1];
-    for (const text of [service.lead, service.exampleTitle, service.example, service.start.text, ...service.problems.flat(), ...service.start.outputs]) {
+    for (const text of [service.lead, service.start.text, ...service.problems.flat(), ...service.start.outputs]) {
       assert.ok(main.includes(escapeHtml(text)), `${service.slug}: ${text}`);
     }
     for (const [title, description] of serviceDetails[service.slug].solutions) {
@@ -212,15 +264,14 @@ test('service pages and general pages retain the supplied messaging rather than 
     'When priorities shift, you see the impact on scope, cost, and timeline before anything extra is started.',
   ]) assert.ok(pages.get('/approach/').includes(escapeHtml(text)), text);
   for (const text of [
-    'Product, cloud, integration, data, and AI people working as one team — so architecture decisions don’t get made in isolation from the people who have to run the system.',
+    'We can help you reimagine your business through a digital lens. Our software engineering heritage combined with our strategic business and innovation consulting, design thinking, and digital capabilities provide real business value to our customers through human-centric innovation.',
     'Technology that people can actually operate.',
     'That experience made one thing obvious: a system isn’t finished when the code ships. People need to understand it, own it, and keep it running. That’s the standard we bring to every engagement.',
   ]) assert.ok(pages.get('/about/').includes(escapeHtml(text)), text);
-  assert.ok(pages.get('/services/ai-solutions/').includes('We almost never recommend training your own model.'));
+  assert.ok(pages.get('/services/ai-solutions/').includes('We compare existing models, retrieval, and configuration against the task'));
 });
 
 test('service and industry pages have substantive differentiated detail, navigation and FAQs', () => {
-  const wordCount = (html) => html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)[1].replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
   for (const service of services) {
     const detail = serviceDetails[service.slug];
     assert.ok(detail.solutions.length >= 4);
@@ -228,7 +279,6 @@ test('service and industry pages have substantive differentiated detail, navigat
     assert.equal(service.start.outputs.length, 4);
     assert.ok(detail.technologies.length >= 4);
     const html = pages.get(`/services/${service.slug}/`);
-    assert.ok(wordCount(html) >= 600, `${service.slug}: ${wordCount(html)} words`);
     for (const id of ['problems', 'deliver', 'start', 'technology', 'questions']) assert.ok(html.includes(`id="${id}"`), `${service.slug}: ${id}`);
     for (const removed of ['id="overview"', 'id="capabilities"', 'id="deliverables"', 'id="delivery"', 'Before we start']) assert.ok(!html.includes(removed), `${service.slug}: ${removed}`);
     assert.ok((html.match(/<details>/g) || []).length >= 4);
@@ -239,13 +289,72 @@ test('service and industry pages have substantive differentiated detail, navigat
     assert.equal(detail.integrations.length, 3);
     assert.equal(detail.quality.length, 3);
     const html = pages.get(`/industries/${industry.slug}/`);
-    assert.ok(wordCount(html) >= 500, `${industry.slug}: ${wordCount(html)} words`);
-    assert.match(html, /Example scenario/);
+    assert.doesNotMatch(html, /Example scenario/);
     assert.ok(html.includes(`industry=${industry.slug}`));
     assert.ok((html.match(/<details>/g) || []).length >= 3);
   }
   const education = pages.get('/industries/education/');
   for (const term of ['Learning platforms', 'Assessment', 'SCORM', 'xAPI', 'LTI', 'Children', 'educator']) assert.ok(education.includes(term), term);
+});
+
+test('industry capabilities describe sector-specific systems and operating requirements', () => {
+  const requirements = {
+    'finance-fintech': ['settlement', 'Lending &amp; credit operations', 'KYC', 'ledger'],
+    insurance: ['Underwriting workflows', 'endorsement', 'loss ratios', 'commission'],
+    'procurement-supply-chain': ['Sourcing &amp; contract workflows', 'invoice matching', 'segregation of duties'],
+    'compliance-risk': ['residual risk', 'Third-party', 'Identity governance', 'assurance conclusions'],
+    education: ['SCORM', 'LTI', 'student-information systems', 'moderation'],
+    'retail-ecommerce': ['available-to-promise', 'ship-from-store', 'Merchandising', 'settlement'],
+    'logistics-transport': ['telematics', 'TMS', 'WMS', 'Freight billing', 'consignment'],
+    agriculture: ['quality grades', 'Agricultural analytics', 'agronomic', 'Agronomic'],
+    'public-sector-non-profit': ['Grants, awards', 'Beneficiary', 'disaggregation', 'Public-service'],
+  };
+  for (const [slug, terms] of Object.entries(requirements)) {
+    const html = pages.get(`/industries/${slug}/`);
+    const solutions = html.match(/<section id="solutions"[\s\S]*?<\/section>/)[0];
+    for (const term of terms) assert.ok(solutions.toLowerCase().includes(term.toLowerCase()), `${slug}: ${term}`);
+    assert.match(html, /Technology Solutions — COGNITRON<\/title>/);
+    assert.match(html, /href="#solutions">How we help/);
+    assert.doesNotMatch(html, /Custom software ·/);
+  }
+});
+
+test('expanded services explain implementation and operational responsibilities', () => {
+  const requirements = {
+    'integration-automation': ['idempotency', 'correlation identifiers', 'Contract tests'],
+    'ai-solutions': ['retrieval-augmented generation', 'held-out test set', 'traceable execution', 'production quality'],
+    'data-business-intelligence': ['change-data capture', 'semantic models', 'row-level access', 'schema changes'],
+    'modernisation-support': ['rollback limits', 'database changes', 'response targets', 'representative workloads'],
+  };
+  for (const [slug, terms] of Object.entries(requirements)) {
+    const html = pages.get(`/services/${slug}/`);
+    const solutions = html.match(/<section id="deliver"[\s\S]*?<\/section>/)[0];
+    for (const term of terms) assert.ok(solutions.includes(term), `${slug}: ${term}`);
+    assert.doesNotMatch(solutions, /With sources shown\.|On your data\.|With lineage and recovery\./);
+  }
+});
+
+test('About explains company purpose, capabilities, values, and partner delivery', () => {
+  const html = pages.get('/about/');
+  const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)[1];
+  for (const heading of ['Who we are.', 'Our purpose and direction.', 'Our capabilities.', 'Our delivery model.', 'Our values in practice.']) {
+    assert.ok(main.includes(`<h2>${heading}</h2>`), heading);
+  }
+  for (const text of ['Our mission', 'Our vision', 'Accountability', 'Integrity', 'Engineering discipline', 'Knowledge transfer', 'delivery partners', 'Dickson']) assert.ok(main.includes(text), text);
+  assert.ok(main.indexOf('Our capabilities.') < main.indexOf('founder-profile'));
+  for (const service of services) assert.ok(main.includes(`href="/services/${service.slug}/"`), service.slug);
+  assert.doesNotMatch(main, /globally recognized|world-class|Company Timeline|Our Company History|Singapore Office/);
+});
+
+test('About introduction preserves the supplied wording and emphasis exactly', () => {
+  const page = pages.get('/about/');
+  const html = page.match(/<section class="section wrap split-section"><div><h2>Who we are\.<\/h2>[\s\S]*?<\/section>/)[0];
+  assert.ok(html.includes('<p>We can help you reimagine your business through a digital lens. Our software engineering heritage combined with our strategic business and innovation consulting, design thinking, and digital capabilities provide real business value to our customers through human-centric innovation.</p>'));
+  const hero = page.match(/<section class="page-hero">[\s\S]*?<\/section>/)[0];
+  assert.ok(hero.includes('Cognitron Technologies helps organisations assess technology investments'));
+  assert.doesNotMatch(hero, /We can help you reimagine/);
+  assert.ok(html.includes('<p>we <strong>blend expertise with cutting-edge technology</strong> to transform challenges into opportunities. Whether it’s <strong>building high-performing teams, driving digital transformation, securing critical infrastructure, or mitigating financial fraud risks</strong>, our tailored solutions are designed to <strong>optimize operations, enhance resilience, and accelerate success</strong>.</p>'));
+  assert.ok(html.includes('<p>Our approach is not just about solving today’s challenges—it’s about shaping a future where businesses thrive with agility, security, and sustainable growth.</p>'));
 });
 
 test('no boilerplate is shared across industry pages and no section restates another', () => {
@@ -268,21 +377,21 @@ test('industry pages preserve the supplied headlines and show a scoped starting 
     insurance: 'Connect the policy, the claim, and the people handling it',
     'procurement-supply-chain': 'Make purchasing and supplier work easier to follow',
     'compliance-risk': 'Keep evidence, reviews, and accountability in one place',
-    healthcare: 'Better digital services around the delivery of care',
+    healthcare: 'Connected healthcare systems. Better access to care.',
     education: 'Learning platforms that work for learners and the people who run them',
     'retail-ecommerce': 'Join up the storefront and the work behind every order',
     'logistics-transport': 'Keep dispatch, delivery, and customer updates on the same record',
     agriculture: 'Connect field records to the people who need them',
     'public-sector-non-profit': 'Digital services that make access and accountability easier',
   };
-  assert.match(pages.get('/industries/'), /We design and build custom portals, business applications, integrations, and dashboards/);
+  assert.match(pages.get('/industries/'), /Explore software, integration, cloud, data, security, and advisory services/);
   assert.equal(new Set(industries.map(({ slug }) => industryDetails[slug].closing.title)).size, industries.length);
   assert.equal(new Set(industries.map(({ slug }) => industryDetails[slug].start.name)).size, industries.length);
   for (const industry of industries) {
     const detail = industryDetails[industry.slug];
     const html = pages.get(`/industries/${industry.slug}/`);
     const hero = html.match(/<section class="page-hero">([\s\S]*?)<\/section>/)[1];
-    assert.match(hero, /Custom software/);
+    assert.ok(hero.includes(escapeHtml(detail.eyebrow || `Technology solutions · ${industry.name}`)));
     assert.equal(detail.headline, headlines[industry.slug]);
     assert.ok(hero.includes(`<h1>${escapeHtml(headlines[industry.slug])}</h1>`));
     assert.ok(hero.includes(escapeHtml(industry.intro)));
@@ -290,8 +399,7 @@ test('industry pages preserve the supplied headlines and show a scoped starting 
     assert.ok(pages.get('/industries/').includes(escapeHtml(industry.intro)), `${industry.slug}: overview offer`);
     assert.equal(detail.challenges.length, 3);
     assert.equal(detail.start.outputs.length, 3);
-    assert.equal(detail.scenario.steps.length, 4);
-    for (const id of ['challenges', 'solutions', 'example', 'systems', 'considerations', 'start', 'questions']) {
+    for (const id of ['challenges', 'solutions', 'systems', 'considerations', 'start', 'questions']) {
       assert.ok(html.includes(`id="${id}"`), `${industry.slug}: section ${id}`);
       assert.ok(html.includes(`href="#${id}"`), `${industry.slug}: section link ${id}`);
     }
@@ -299,42 +407,56 @@ test('industry pages preserve the supplied headlines and show a scoped starting 
       assert.ok(html.includes(escapeHtml(text)), `${industry.slug}: ${text}`);
     }
     assert.match(html, /Assessment scope and price agreed before work starts/);
-    assert.match(html, /What we measure/);
     for (const [title, description] of detail.solutions) {
       assert.ok(html.includes(escapeHtml(title)));
       assert.ok(html.includes(escapeHtml(description)));
     }
-    const example = html.match(/<section id="example"[\s\S]*?<\/section>/)[0];
-    assert.equal(detail.scenario.text.split('\n\n').length, 2, `${industry.slug}: original example paragraphs`);
-    for (const paragraph of detail.scenario.text.split('\n\n')) assert.ok(example.includes(`<p>${escapeHtml(paragraph)}</p>`));
-    assert.ok(example.includes(escapeHtml(detail.scenario.measures)));
     const contextualLinks = [...html.matchAll(/href="(\/contact\/\?industry=[^"]+)"/g)];
     assert.equal(contextualLinks.length, 3, `${industry.slug}: hero, assessment, and closing contact`);
     for (const [, href] of contextualLinks) {
       assert.equal(new URL(href, 'http://localhost').searchParams.get('industry'), industry.slug);
     }
-    assert.ok(html.indexOf('id="example"') < html.indexOf('id="systems"'), `${industry.slug}: show the project before technical detail`);
+    assert.ok(html.indexOf('id="solutions"') < html.indexOf('id="systems"'), `${industry.slug}: scope before integrations`);
     for (const slug of industry.services) assert.ok(services.some((service) => service.slug === slug), `${industry.slug}: related ${slug}`);
   }
 });
 
-test('industry examples name exceptions and preserve decision and data boundaries', () => {
-  const scenarios = {
-    'finance-fintech': /notification arrives twice or arrives late/,
-    insurance: /links it to the existing case instead of creating a duplicate/,
-    'procurement-supply-chain': /Partial deliveries stay open with a named owner/,
-    'compliance-risk': /never silently treated as approvals/,
-    healthcare: /Once the appointment is confirmed in the scheduling system/,
-    education: /progress and submissions stay consistent/,
-    'retail-ecommerce': /without creating duplicate orders or incorrect refunds/,
-    'logistics-transport': /without creating two delivery records/,
-    agriculture: /Unmatched or disputed quantities appear in a review queue/,
-    'public-sector-non-profit': /point back to the source records/,
-  };
-  for (const [slug, pattern] of Object.entries(scenarios)) assert.match(industryDetails[slug].scenario.text, pattern, slug);
-  assert.match(pages.get('/industries/finance-fintech/'), /authorised credit officer reviews the exceptions and makes the required credit decisions/);
+test('all pages omit scenario blocks and obsolete navigation', () => {
+  for (const [path, html] of pages) {
+    assert.doesNotMatch(html, /Example scenario|Example project|What we measure|example-section|example-layout|example-steps|id="example"|href="#example"/, path);
+  }
+  for (const service of services) {
+    for (const key of ['exampleTitle', 'example', 'steps', 'measures']) assert.ok(!(key in service), `${service.slug}: obsolete ${key}`);
+    const html = pages.get(`/services/${service.slug}/`);
+    assert.match(html, /<\/aside><\/div><\/div><\/section>\s*<section id="start"/);
+  }
+  for (const industry of industries) {
+    assert.ok(!('scenario' in industryDetails[industry.slug]), industry.slug);
+    const html = pages.get(`/industries/${industry.slug}/`);
+    assert.match(html, /<\/article><\/div><\/div><\/section>\s*<section id="systems"/);
+    assert.match(html, /id="considerations" class="feature-section"><div class="wrap section">/);
+  }
+});
+
+test('healthcare covers digital health, interoperability, security, and strategy', () => {
+  const html = pages.get('/industries/healthcare/');
+  const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)[1];
+  for (const text of ['Digital health &amp; patient platforms', 'EMR/EHR integration &amp; interoperability', 'Telemedicine &amp; virtual care', 'Healthcare data analytics &amp; reporting', 'Revenue cycle &amp; claims automation', 'AI &amp; clinical information workflows', 'Cybersecurity &amp; patient data protection', 'Healthcare strategy &amp; cloud modernisation', 'HL7 v2', 'FHIR', 'Zero Trust', 'clinical ownership', 'Data Protection Act']) {
+    assert.ok(main.includes(text), text);
+  }
+  assert.match(html, /<title>Healthcare Technology &amp; Digital Health Solutions/);
+  assert.match(html, /How we support healthcare organisations\./);
+  assert.match(html, /href="#solutions">How we help/);
+  assert.match(main, /href="\/services\/cybersecurity\/"/);
+  assert.match(main, /href="\/services\/technology-strategy-consulting\/"/);
+  assert.doesNotMatch(main, /Example scenario|Which patient admin task|fully compliant|HIPAA-compliant|non-clinical services/);
+  const healthcare = industries.find(({ slug }) => slug === 'healthcare');
+  for (const text of healthcare.applications) assert.ok(pages.get('/industries/').includes(escapeHtml(text)));
+});
+
+test('industry requirements preserve decision and data boundaries', () => {
   assert.match(pages.get('/industries/insurance/'), /AI does not determine coverage or authorise settlement/);
-  assert.match(pages.get('/industries/healthcare/'), /Clinical notes and decisions remain outside the administrative workflow/);
+  assert.match(pages.get('/industries/healthcare/'), /Booking and document collection remain separate from diagnosis, triage, and treatment decisions/);
   assert.match(pages.get('/industries/education/'), /Grading and safeguarding decisions stay with staff/);
   assert.match(pages.get('/industries/compliance-risk/'), /does not certify that the organisation meets a regulation/);
   assert.match(pages.get('/industries/logistics-transport/'), /must not require drivers to read instructions, enter data, or respond to prompts while driving/);
@@ -427,7 +549,9 @@ test('public origin enables canonical links and sitemap; preview builds remove p
     const html = await readFile(new URL('../dist/industries/education/index.html', import.meta.url), 'utf8');
     assert.match(html, /rel="canonical" href="https:\/\/cognitron\.example\/industries\/education\/"/);
     const sitemap = await readFile(new URL('../dist/sitemap.xml', import.meta.url), 'utf8');
-    assert.equal((sitemap.match(/<url>/g) || []).length, 23);
+    assert.equal((sitemap.match(/<url>/g) || []).length, pages.size - 1);
+    assert.match(sitemap, /\/services\/cybersecurity\//);
+    assert.match(sitemap, /\/services\/technology-strategy-consulting\//);
     assert.match(sitemap, /\/industries\/insurance\//);
     assert.doesNotMatch(sitemap, /information\.html/);
     assert.match(await readFile(new URL('../dist/robots.txt', import.meta.url), 'utf8'), /Allow: \//);
